@@ -15,7 +15,8 @@
     "assets:og": "node tools/gen-og.mjs",
     "fonts": "node tools/gen-fonts.mjs",
     "qa": "node tools/qa.mjs http://localhost:4321",
-    "shots": "node tools/shot.mjs http://localhost:4321 1440"
+    "shots": "node tools/shot.mjs http://localhost:4321 1440",
+    "photos": "node tools/prep-photos.mjs"
   },
   "dependencies": {
     "astro": "^5.18.2",
