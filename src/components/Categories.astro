@@ -1,0 +1,200 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { categories } from '../data/categories';
+import { minPrice, countIn } from '../data/products';
+import { asset } from '../lib/paths';
+---
+
+<section class="sec" id="categories">
+  <div class="wrap">
+    <SectionHead n="03" title="Категории" meta={`${categories.length} категорий`} />
+
+    <div class="cat__head">
+      <h2 class="t-h2" data-reveal="lines">Что берут чаще всего</h2>
+      <p class="t-body cat__sub" data-reveal="fade">
+        Шесть категорий закрывают 90% задач. Остальное — под заказ, привозим за 2–3 дня.
+      </p>
+    </div>
+
+    <!-- Бенто: две крупные плитки и четыре малые. Категории различаются
+         фотографией, а не цветом — цвет на странице зарезервирован. -->
+    <div class="bento" data-reveal-group>
+      {
+        categories.map((c) => (
+          <a href="#quiz" class={`tile ${c.large ? 'tile--lg' : ''}`}>
+            <div class="tile__media ph">
+              <img
+                src={asset(c.img)}
+                alt={c.alt}
+                width={c.large ? 900 : 600}
+                height={c.large ? 640 : 520}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="tile__body">
+              <div>
+                <h3 class="tile__title">{c.title}</h3>
+                <p class="t-micro tile__sub">
+                  {c.sub} · от {minPrice(c.id).toLocaleString('ru-RU')} ₽ · {countIn(c.id)} поз.
+                </p>
+              </div>
+              <span class="tile__arrow" aria-hidden="true">
+                <svg viewBox="0 0 20 20" width="20" height="20">
+                  <path
+                    d="M4 10h12M11 5l5 5-5 5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .cat__head {
+    display: grid;
+    gap: 16px;
+    margin-block: 28px 32px;
+  }
+  .cat__sub {
+    color: var(--c-steel);
+  }
+
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    background: var(--c-paper-2);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: transform var(--dur) var(--ease);
+  }
+  .tile::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--c-signal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
+  }
+  .tile:hover::after {
+    transform: scaleX(1);
+  }
+  .tile:hover {
+    transform: translateY(-4px);
+  }
+
+  .tile__media {
+    aspect-ratio: 4 / 3;
+  }
+  .tile--lg .tile__media {
+    aspect-ratio: 16 / 11;
+  }
+  /* contain, а не cover: в малой плитке кроп резал этикетку пополам,
+     а этикетка здесь и есть содержание. */
+  .tile__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+  }
+
+  .tile__body {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px;
+    border-top: 1px solid var(--c-line);
+    flex: 1;
+  }
+  .tile__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(17px, 2.2vw, 26px);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 6px;
+  }
+  .tile__sub {
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+  }
+  .tile__arrow {
+    flex: none;
+    color: var(--c-steel);
+    transition:
+      color var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+  .tile:hover .tile__arrow {
+    color: var(--c-signal);
+    transform: translateX(3px);
+  }
+
+  @media (min-width: 760px) {
+    .sec {
+      padding-block: 80px;
+    }
+    /* Асимметрия задаётся явно: две крупные плитки стоят уступом,
+       иначе бенто вырождается в обычную сетку 2×3. */
+    .bento {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(3, clamp(190px, 19vw, 250px));
+      gap: 16px;
+    }
+    .bento > :nth-child(1) {
+      grid-area: 1 / 1 / 3 / 3;
+    }
+    .bento > :nth-child(2) {
+      grid-area: 2 / 3 / 4 / 5;
+    }
+    .bento > :nth-child(3) {
+      grid-area: 1 / 3 / 2 / 4;
+    }
+    .bento > :nth-child(4) {
+      grid-area: 1 / 4 / 2 / 5;
+    }
+    .bento > :nth-child(5) {
+      grid-area: 3 / 1 / 4 / 2;
+    }
+    .bento > :nth-child(6) {
+      grid-area: 3 / 2 / 4 / 3;
+    }
+    .tile__media,
+    .tile--lg .tile__media {
+      aspect-ratio: auto;
+      flex: 1;
+      min-height: 0;
+    }
+    .tile__body {
+      flex: none;
+    }
+    .tile__sub {
+      font-size: 11px;
+    }
+  }
+</style>

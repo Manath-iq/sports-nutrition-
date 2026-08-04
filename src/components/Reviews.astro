@@ -1,0 +1,196 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { client } from '../config/client.config';
+import { mapReview, textReview, videoReview } from '../data/content';
+import { asset } from '../lib/paths';
+---
+
+<section class="sec rev">
+  <div class="wrap">
+    <SectionHead n="11" title="Отзывы" meta={`Рейтинг ${client.stats.rating} в 2ГИС`} />
+
+    <h2 class="t-h2 rev__h" data-reveal="lines">Что пишут покупатели</h2>
+
+    <!-- Три носителя доверия: карточка с карт, текст с фото, видео.
+         Ни «до/после», ни слов о лечении — см. раздел 7 ТЗ. -->
+    <div class="rev__grid" data-reveal-group>
+      <article class="rcard rcard--map">
+        <header class="rcard__top">
+          <span class="t-data">{mapReview.source}</span>
+          <span class="rcard__stars" role="img" aria-label={`Оценка ${mapReview.rating} из 5`}>
+            {Array.from({ length: 5 }).map(() => <span aria-hidden="true">★</span>)}
+          </span>
+        </header>
+        <p class="rcard__text">{mapReview.text}</p>
+        <footer class="rcard__foot t-micro">
+          <span>{mapReview.author}</span>
+          <span>{mapReview.date}</span>
+        </footer>
+      </article>
+
+      <article class="rcard">
+        <div class="rcard__person">
+          <img
+            class="rcard__avatar"
+            src={asset(textReview.photo)}
+            alt={`${textReview.author}, покупатель`}
+            width="200"
+            height="200"
+            loading="lazy"
+            decoding="async"
+          />
+          <div>
+            <p class="rcard__name">{textReview.author}</p>
+            <p class="t-micro">{textReview.age} лет · {textReview.goal}</p>
+          </div>
+        </div>
+        <p class="rcard__text">{textReview.text}</p>
+      </article>
+
+      <article class="rcard rcard--video">
+        <div class="rcard__video">
+          <img
+            src={asset(videoReview.poster)}
+            alt={`Видео-отзыв: ${videoReview.author}`}
+            width="560"
+            height="760"
+            loading="lazy"
+            decoding="async"
+          />
+          <button type="button" class="rcard__play" aria-label="Смотреть видео-отзыв">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M8 5l12 7-12 7V5Z" fill="currentColor"></path>
+            </svg>
+          </button>
+          <span class="rcard__dur t-micro">0:{String(videoReview.seconds).padStart(2, '0')}</span>
+        </div>
+        <p class="rcard__text">
+          {videoReview.author}, {videoReview.age} · {videoReview.text}
+        </p>
+      </article>
+    </div>
+
+    <a href={client.contacts.social.twoGis} class="btn btn-outline rev__all" target="_blank" rel="noopener">
+      Читать все отзывы в 2ГИС
+    </a>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .rev__h {
+    margin-block: 28px 32px;
+  }
+  .rev__grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .rcard {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+    background: var(--c-paper-2);
+    border-radius: var(--radius-card);
+  }
+  .rcard__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--c-line);
+    color: var(--c-steel);
+  }
+  .rcard__stars {
+    color: var(--c-ink);
+    letter-spacing: 2px;
+    font-size: 13px;
+  }
+  .rcard__text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .rcard__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--c-line);
+  }
+
+  .rcard__person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .rcard__avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--c-paper);
+  }
+  .rcard__name {
+    font-weight: 600;
+  }
+
+  .rcard__video {
+    position: relative;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    aspect-ratio: 9 / 13;
+    background: var(--c-paper);
+  }
+  .rcard__video img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .rcard__play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 62px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    cursor: pointer;
+    transition: transform var(--dur) var(--ease);
+  }
+  .rcard__play:hover {
+    transform: scale(1.06);
+  }
+  .rcard__dur {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--c-ink) 82%, transparent);
+    color: var(--c-paper);
+  }
+
+  .rev__all {
+    margin-top: 24px;
+  }
+
+  @media (min-width: 900px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .rev__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+  }
+</style>

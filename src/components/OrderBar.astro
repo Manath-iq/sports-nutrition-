@@ -1,0 +1,98 @@
+---
+import { client } from '../config/client.config';
+
+// Плавающая корзина-заявка. Не магазин: оплаты нет, состав уходит
+// продавцу в WhatsApp одним сообщением.
+const wa = `https://wa.me/${client.contacts.whatsapp}`;
+---
+
+<div class="obar" data-order-bar inert aria-live="polite">
+  <div class="wrap obar__in">
+    <div class="obar__info">
+      <span class="obar__count num" data-order-count>0</span>
+      <span class="obar__meta">
+        <span class="t-data" data-order-word>позиций</span>
+        <span class="t-micro">на <span data-order-total>0 ₽</span></span>
+      </span>
+    </div>
+    <div class="obar__actions">
+      <button type="button" class="obar__clear t-micro" data-order-clear>Очистить</button>
+      <a
+        class="btn btn-sm btn-signal"
+        data-order-send
+        data-wa={wa}
+        href={wa}
+        target="_blank"
+        rel="noopener">Отправить заявку</a
+      >
+    </div>
+  </div>
+</div>
+
+<style>
+  .obar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    transform: translateY(110%);
+    transition: transform 320ms var(--ease);
+    background: var(--c-paper);
+    border-top: 1px solid var(--c-line-strong);
+    padding-block: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .obar[data-open='true'] {
+    transform: translateY(0);
+  }
+  .obar__in {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .obar__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .obar__count {
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .obar__meta {
+    display: grid;
+  }
+  .obar__meta .t-data {
+    color: var(--c-steel);
+  }
+  .obar__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .obar__clear {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: none;
+  }
+  .obar__clear:hover {
+    color: var(--c-ink);
+  }
+
+  @media (min-width: 600px) {
+    .obar__clear {
+      display: inline;
+    }
+  }
+</style>
+
+<script>
+  import { initOrder } from '../scripts/order';
+  initOrder();
+</script>

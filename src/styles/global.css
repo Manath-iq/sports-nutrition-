@@ -1,0 +1,686 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   ШРИФТЫ
+   Кириллица + латиница, variable woff2, font-display: swap.
+   Латиница нужна даже на русской странице — в ней лежат цифры.
+   Файлы подрезаны под реальный набор символов и под тот диапазон
+   веса, который используется: tools/gen-fonts.mjs. Диапазоны ниже
+   обязаны совпадать с подрезкой, иначе браузер начнёт синтезировать
+   начертание сам.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700 800;
+  src: url('../assets/fonts/unbounded-cyrillic.woff2') format('woff2-variations');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700 800;
+  src: url('../assets/fonts/unbounded-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Onest';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 600;
+  src: url('../assets/fonts/onest-cyrillic.woff2') format('woff2-variations');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Onest';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 600;
+  src: url('../assets/fonts/onest-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 500;
+  src: url('../assets/fonts/mono-cyrillic.woff2') format('woff2-variations');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 500;
+  src: url('../assets/fonts/mono-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* ============================================================
+   ТОКЕНЫ
+   Живут в :root как обычные переменные, чтобы тема и акцент
+   клиента подменялись в рантайме. Tailwind ссылается на них.
+   ============================================================ */
+
+:root {
+  --c-ink: #14171a; /* основной текст, почти-чёрный с холодным уходом */
+  --c-paper: #efeee9; /* фон, тон сухой сыворотки */
+  --c-paper-2: #e3e2dc; /* вторичные поверхности, карточки */
+  /* В ТЗ указан #8A9299, но он даёт 2.4:1 на карточках при требуемых
+     в том же ТЗ 4.5:1. Тон сохранён, светлота опущена до нормы:
+     5.1:1 на бумаге и 4.6:1 на карточке. */
+  --c-steel: #5d656c; /* подписи, единицы измерения */
+  /* Ультрамарин: ТОЛЬКО действия и активные состояния.
+     Фирменный цвет клиента приходит инлайном в --c-accent, поэтому сам
+     сигнал всегда вычисляется — иначе инлайн-стиль перебивал бы тему. */
+  --c-signal: var(--c-accent, #1f3cff);
+  /* ТОЛЬКО результаты расчёта и «мало осталось».
+     Исходный #FF5A1F из ТЗ даёт 2.4:1 на бумаге — крупные цифры не проходят
+     даже по смягчённой норме 3:1 для большого кегля. Тон сохранён,
+     светлота опущена: 3.3:1 для крупных цифр и отдельный тон для мелкого. */
+  --c-heat: #e04200;
+  --c-heat-ink: #b33200; /* тот же сигнал, но для подписей мелким кеглем */
+  --c-line: rgba(20, 23, 26, 0.14); /* хайрлайны таблиц */
+  --c-line-strong: rgba(20, 23, 26, 0.28);
+  --c-on-signal: #efeee9; /* текст на ультрамарине */
+
+  --page: 1320px;
+  --gutter: 24px;
+
+  --dur-fast: 160ms;
+  --dur: 240ms;
+  --dur-slow: 420ms;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --header-h: 68px;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 48px;
+  }
+}
+
+/* Тёмная тема — опция конфига, не дефолт.
+   ink и paper меняются ролями: фон уходит в графит, текст в бумагу. */
+[data-theme='dark'] {
+  --c-ink: #f4f3ee;
+  --c-paper: #0e1013;
+  --c-paper-2: #171a1f;
+  --c-steel: #7e868d;
+  /* На графите ультрамарин поднимается: осветляем любой акцент клиента,
+     а не только дефолтный. */
+  --c-signal: color-mix(in oklab, var(--c-accent, #1f3cff) 78%, #fff);
+  /* На графите ограничение снимается — возвращаем исходный оранжевый. */
+  --c-heat: #ff5a1f;
+  --c-heat-ink: #ff7a4a;
+  --c-line: rgba(244, 243, 238, 0.16);
+  --c-line-strong: rgba(244, 243, 238, 0.3);
+  --c-on-signal: #ffffff;
+}
+
+/* Инверсная секция (финальный CTA) — те же токены, вывернутые.
+   Работает и в светлой, и в тёмной теме. */
+.invert-panel {
+  --c-paper: #14171a;
+  --c-paper-2: #1c2025;
+  --c-ink: #efeee9;
+  --c-steel: #8a9299;
+  --c-line: rgba(239, 238, 233, 0.18);
+  --c-line-strong: rgba(239, 238, 233, 0.32);
+  --c-signal: color-mix(in oklab, var(--c-accent, #1f3cff) 78%, #fff);
+  --c-heat: #ff5a1f;
+  --c-heat-ink: #ff7a4a;
+  background: var(--c-paper);
+  color: var(--c-ink);
+}
+[data-theme='dark'] .invert-panel {
+  --c-paper: #f4f3ee;
+  --c-paper-2: #e3e2dc;
+  --c-ink: #14171a;
+  --c-line: rgba(20, 23, 26, 0.16);
+  --c-line-strong: rgba(20, 23, 26, 0.3);
+  --c-signal: var(--c-accent, #1f3cff);
+  --c-heat: #e04200;
+  --c-heat-ink: #b33200;
+}
+
+@theme inline {
+  --color-ink: var(--c-ink);
+  --color-paper: var(--c-paper);
+  --color-paper-2: var(--c-paper-2);
+  --color-steel: var(--c-steel);
+  --color-signal: var(--c-signal);
+  --color-heat: var(--c-heat);
+  --color-heat-ink: var(--c-heat-ink);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-on-signal: var(--c-on-signal);
+
+  --font-display: 'Unbounded', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Onest', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Радиусы: 0 для таблиц, 4px для карточек, 999px для кнопок и чипов.
+     Никаких 16px-скруглений везде. */
+  --radius-card: 4px;
+  --radius-pill: 999px;
+}
+
+/* ============================================================
+   БАЗА
+   ============================================================ */
+
+@layer base {
+  * {
+    min-width: 0;
+  }
+
+  html {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  /* Lenis берёт скролл на себя — нативный smooth тогда мешает. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+  html.lenis body {
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    font-weight: 400;
+    font-feature-settings: 'kern' 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    /* overflow-x на body не ставим: clip распространяется на вьюпорт
+       и обрезает всё, что ниже первого экрана. Горизонтальные выносы
+       гасятся там, где они возникают, — в герое и в лентах. */
+  }
+
+  ::selection {
+    background: var(--c-signal);
+    color: var(--c-on-signal);
+  }
+
+  /* Фокус видимый везде — ультрамариновая обводка 2px. */
+  :focus-visible {
+    outline: 2px solid var(--c-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  /* Цифры не должны прыгать в счётчиках и ценах. */
+  .font-mono,
+  input[type='number'] {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ============================================================
+   ТИПОГРАФИКА
+   ============================================================ */
+
+/* Размер вынесен в переменную: секция может опустить потолок, не переопределяя
+   утилиту. Длинный заголовок в 104px съедает весь первый экран. */
+@utility t-h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--h1-size, clamp(44px, 7.2vw, 104px));
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* Как и H1: потолок в переменной. Полосой на всю ширину 60px читается
+   отлично, в половинной колонке тот же кегль даёт пять строк. */
+@utility t-h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--h2-size, clamp(32px, 4.4vw, 60px));
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+@utility t-h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(20px, 1.6vw, 24px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+@utility t-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: clamp(16px, 1.15vw, 18px);
+  line-height: 1.55;
+  max-width: 62ch;
+}
+
+/* Моноширинная подпись-эйбрау. Капс разрешён только здесь. */
+@utility t-data {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(13px, 0.95vw, 14px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility t-micro {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: 0.03em;
+  color: var(--c-steel);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   СЕТКА
+   ============================================================ */
+
+@utility wrap {
+  width: 100%;
+  max-width: calc(var(--page) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Разлиновка этикетки: вертикальные хайрлайны колонок. */
+@utility label-rules {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--c-line) 0 1px,
+    transparent 1px calc(100% / 6)
+  );
+}
+
+/* ============================================================
+   ЧИСЛО + ЕДИНИЦА — визуальная подпись шаблона.
+   Любое число моноширинное, единица мельче и в --steel.
+   ============================================================ */
+
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@utility num-display {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(40px, 5.6vw, 76px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+
+/* Единица измерения под числом. */
+@utility num-unit {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: clamp(11px, 0.9vw, 13px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-steel);
+  line-height: 1.25;
+  display: block;
+}
+
+/* ============================================================
+   ЛИНЕЙКИ И ПОВЕРХНОСТИ
+   Глубина создаётся наложением бумажных слоёв, не тенями.
+   ============================================================ */
+
+@utility hairline {
+  border: 0;
+  height: 1px;
+  width: 100%;
+  background: var(--c-line);
+}
+
+@utility panel {
+  background: var(--c-paper-2);
+  border-radius: var(--radius-card);
+}
+
+@utility panel-row {
+  display: grid;
+  align-items: center;
+  border-top: 1px solid var(--c-line);
+}
+
+/* ============================================================
+   КНОПКИ
+   Заливка ультрамарином снизу вверх за 240мс.
+   ============================================================ */
+
+@utility btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 54px;
+  padding-inline: 28px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@utility btn-sm {
+  height: 44px;
+  padding-inline: 20px;
+  font-size: 15px;
+}
+
+@utility btn-signal {
+  background: var(--c-signal);
+  color: var(--c-on-signal);
+  border: 1px solid var(--c-signal);
+}
+
+@utility btn-outline {
+  background: transparent;
+  color: var(--c-ink);
+  border: 1px solid var(--c-line-strong);
+}
+
+/* Заливка снизу вверх */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-signal);
+  transform: translateY(101%);
+  transition: transform var(--dur) var(--ease);
+}
+.btn-outline:hover {
+  color: var(--c-on-signal);
+  border-color: var(--c-signal);
+}
+.btn-outline:hover::before {
+  transform: translateY(0);
+}
+.btn-signal::before {
+  background: color-mix(in oklab, var(--c-signal) 78%, #000);
+}
+.btn-signal:hover::before {
+  transform: translateY(0);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding-inline: 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--c-steel);
+  background: transparent;
+  cursor: default;
+  white-space: nowrap;
+}
+
+@utility chip-active {
+  border-color: var(--c-signal);
+  color: var(--c-signal);
+}
+
+/* Ссылка с подчёркиванием-хайрлайном, растущим при наведении */
+@utility link-rule {
+  position: relative;
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+}
+.link-rule::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease);
+}
+.link-rule:hover::after {
+  transform: scaleX(1);
+}
+
+/* ============================================================
+   ФОРМЫ
+   ============================================================ */
+
+@utility field {
+  width: 100%;
+  height: 54px;
+  padding-inline: 18px;
+  background: transparent;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--c-ink);
+  transition: border-color var(--dur) var(--ease);
+}
+.field::placeholder {
+  color: var(--c-steel);
+  text-transform: none;
+}
+.field:focus {
+  border-color: var(--c-signal);
+}
+.field[aria-invalid='true'] {
+  border-color: var(--c-heat);
+}
+
+/* ============================================================
+   ДВИЖЕНИЕ
+   Состояние появления ставит IntersectionObserver атрибутом data-in,
+   само движение ведёт CSS. Без JS всё видно сразу.
+   ============================================================ */
+
+@utility reveal-line {
+  display: block;
+  overflow: hidden;
+}
+
+html.js-motion [data-reveal='fade'],
+html.js-motion [data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.7s var(--ease);
+}
+html.js-motion [data-reveal-group] > * {
+  transform: translateY(20px);
+  transition-delay: calc(var(--i, 0) * 50ms);
+}
+html.js-motion [data-reveal='fade'][data-in],
+html.js-motion [data-reveal-group][data-in] > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* Заголовки раскрываются построчно: маска обрезает, строка выезжает снизу. */
+html.js-motion [data-reveal='lines'] .reveal-line > span {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 0.9s var(--ease);
+  transition-delay: calc(var(--i, 0) * 60ms);
+  will-change: transform;
+}
+html.js-motion [data-reveal='lines'][data-in] .reveal-line > span {
+  transform: none;
+}
+
+/* Первый экран не ждёт ни одного скрипта: заголовок героя поднимается
+   по словам чистым CSS сразу после парсинга. LCP не должен зависеть от JS. */
+.rise {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.rise > span {
+  display: inline-block;
+  padding-bottom: 0.06em;
+}
+/* Шаг и длительность держим короткими: пока слово не выехало из-под маски,
+   оно не отрисовано, и анимация напрямую утяжеляет LCP первого экрана. */
+html.js-motion .rise > span {
+  transform: translateY(105%);
+  animation: rise 0.62s var(--ease) forwards;
+  animation-delay: calc(var(--i) * 0.03s);
+}
+@keyframes rise {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* То же для остального содержимого первого экрана: без ожидания скриптов. */
+html.js-motion .fade-up {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeup 0.7s var(--ease) forwards;
+  animation-delay: calc(var(--d, 0) * 1ms + 200ms);
+}
+@keyframes fadeup {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Разворот этикетки: стартовое состояние ставит CSS, дальше ведёт скрипт.
+   Прозрачность не трогаем — полупрозрачный текст на бумаге не проходит
+   по контрасту, а сам жест держится на повороте плоскости. */
+html.js-motion [data-unfold-box] {
+  transform: perspective(1400px) rotateX(-76deg) scale(0.46, 0.72);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Бегущая строка брендов */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Мерцание-плейсхолдер для лениво грузящихся фото */
+@utility ph {
+  background: var(--c-paper-2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Скрыть скроллбар у горизонтальных лент */
+@utility no-bar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Доступность: скрыто визуально, доступно скринридеру */
+@utility sr-only-x {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

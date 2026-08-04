@@ -1,0 +1,130 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { faq } from '../data/content';
+---
+
+<section class="sec faq-sec" id="faq">
+  <div class="wrap">
+    <SectionHead n="14" title="Вопросы" meta={`${faq.length} ответов`} />
+
+    <div class="faq__grid">
+      <div class="faq__aside">
+        <h2 class="t-h2" data-reveal="lines">Что спрашивают чаще всего</h2>
+        <p class="t-micro faq__note" data-reveal="fade">
+          Не нашли свой вопрос — напишите в WhatsApp, отвечаем в рабочее время.
+        </p>
+      </div>
+
+      <div class="faq" data-reveal-group>
+        {
+          faq.map((item, i) => (
+            <details class="faq__item" open={i === 0} name="faq">
+              <summary class="faq__q">
+                <span class="t-micro faq__n">{String(i + 1).padStart(2, '0')}</span>
+                <span class="faq__qt">{item.q}</span>
+                <span class="faq__mark" aria-hidden="true" />
+              </summary>
+              <div class="faq__a">
+                <p>{item.a}</p>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-sec {
+    padding-block: 56px;
+  }
+  .faq__grid {
+    display: grid;
+    gap: 28px;
+    margin-top: 28px;
+  }
+  .faq__note {
+    margin-top: 16px;
+    max-width: 34ch;
+  }
+
+  .faq {
+    border-top: 1px solid var(--c-line-strong);
+  }
+  .faq__item {
+    border-bottom: 1px solid var(--c-line);
+  }
+  .faq__q {
+    display: grid;
+    grid-template-columns: 38px 1fr 24px;
+    align-items: start;
+    gap: 12px;
+    padding-block: 20px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .faq__n {
+    padding-top: 5px;
+  }
+  .faq__qt {
+    font-size: clamp(17px, 1.8vw, 20px);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  /* Плюс из двух линий: вертикальная исчезает при раскрытии. */
+  .faq__mark {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin-top: 6px;
+    justify-self: end;
+  }
+  .faq__mark::before,
+  .faq__mark::after {
+    content: '';
+    position: absolute;
+    background: var(--c-ink);
+    transition: transform var(--dur) var(--ease);
+  }
+  .faq__mark::before {
+    left: 0;
+    top: 7.5px;
+    width: 16px;
+    height: 1.5px;
+  }
+  .faq__mark::after {
+    left: 7.5px;
+    top: 0;
+    width: 1.5px;
+    height: 16px;
+  }
+  .faq__item[open] .faq__mark::after {
+    transform: scaleY(0);
+  }
+  .faq__item[open] .faq__qt {
+    color: var(--c-signal);
+  }
+
+  .faq__a {
+    padding: 0 24px 22px 50px;
+    color: var(--c-steel);
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 68ch;
+  }
+
+  @media (min-width: 900px) {
+    .faq-sec {
+      padding-block: 80px;
+    }
+    .faq__grid {
+      grid-template-columns: 1fr 1.4fr;
+      gap: 56px;
+      align-items: start;
+    }
+  }
+</style>

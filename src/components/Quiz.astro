@@ -1,0 +1,411 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+
+/** Четыре шага, один экран. Ответ выбирается кликом — кнопки «далее» нет. */
+const steps = [
+  {
+    key: 'goal',
+    label: 'Цель',
+    q: 'Что сейчас важнее?',
+    options: [
+      { v: 'mass', l: 'Набрать массу', note: 'Вес растёт медленно' },
+      { v: 'cut', l: 'Похудеть и сохранить мышцы', note: 'Жир уходит, мышцы жалко' },
+      { v: 'power', l: 'Больше сил на тренировке', note: 'Веса стоят на месте' },
+      { v: 'protein', l: 'Просто добираю белок', note: 'Еды не хватает по норме' },
+    ],
+  },
+  {
+    key: 'exp',
+    label: 'Опыт',
+    q: 'Сколько занимаетесь?',
+    options: [
+      { v: 'novice', l: 'Меньше 6 месяцев', note: '' },
+      { v: 'mid', l: 'От полугода до 2 лет', note: '' },
+      { v: 'pro', l: 'Больше 2 лет', note: '' },
+    ],
+  },
+  {
+    key: 'limit',
+    label: 'Ограничения',
+    q: 'Есть ограничения по составу?',
+    options: [
+      { v: 'lactose', l: 'Плохо переношу молоко', note: '' },
+      { v: 'plant', l: 'Не ем животное', note: '' },
+      { v: 'none', l: 'Ограничений нет', note: '' },
+    ],
+  },
+  {
+    key: 'budget',
+    label: 'Бюджет',
+    q: 'Сколько готовы тратить в месяц?',
+    options: [
+      { v: 'low', l: 'До 3 000 ₽', note: '' },
+      { v: 'mid', l: '3 000–6 000 ₽', note: '' },
+      { v: 'high', l: 'Больше 6 000 ₽', note: '' },
+    ],
+  },
+];
+---
+
+<section class="sec quiz-sec" id="quiz">
+  <div class="wrap">
+    <SectionHead n="05" title="Конструктор цели" meta="4 вопроса · 1 минута" />
+
+    <div class="quiz__head">
+      <h2 class="t-h2" data-reveal="lines">Соберём ваш набор</h2>
+      <p class="t-body quiz__sub" data-reveal="fade">
+        Четыре вопроса. На выходе — конкретные банки, дозировки и цена. Ничего не отправляем
+        без вашего согласия.
+      </p>
+    </div>
+
+    <div class="quiz" data-quiz>
+      <div class="quiz__bar" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-label="Прогресс подбора">
+        <i data-quiz-bar></i>
+      </div>
+
+      <div class="quiz__top t-data">
+        <span data-quiz-step>Шаг 1 / 4</span>
+        <span class="quiz__crumbs" data-quiz-crumbs></span>
+      </div>
+
+      <div class="quiz__stage" data-quiz-stage>
+        {
+          steps.map((step, i) => (
+            <fieldset class="qstep" data-step={i} hidden={i > 0}>
+              <legend class="qstep__q t-h3">{step.q}</legend>
+              <div class="qstep__opts" role="radiogroup" aria-label={step.label}>
+                {step.options.map((o, j) => (
+                  <button
+                    type="button"
+                    class="opt"
+                    role="radio"
+                    aria-checked="false"
+                    tabindex={j === 0 ? 0 : -1}
+                    data-key={step.key}
+                    data-value={o.v}
+                  >
+                    <span class="opt__n t-micro">{String(j + 1).padStart(2, '0')}</span>
+                    <span class="opt__l">{o.l}</span>
+                    {o.note && <span class="opt__note t-micro">{o.note}</span>}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          ))
+        }
+
+        <div class="qresult" data-quiz-result hidden aria-live="polite"></div>
+      </div>
+
+      <div class="quiz__foot">
+        <button type="button" class="quiz__back t-data" data-quiz-back hidden>← Назад</button>
+        <p class="t-micro quiz__note">
+          Подбор ориентировочный. При хронических заболеваниях и приёме лекарств
+          сначала посоветуйтесь с врачом.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initQuiz } from '../scripts/quiz';
+  initQuiz();
+</script>
+
+<style>
+  .quiz-sec {
+    padding-block: 56px;
+  }
+  .quiz__head {
+    display: grid;
+    gap: 16px;
+    margin-block: 28px 32px;
+  }
+  .quiz__sub {
+    color: var(--c-steel);
+  }
+
+  .quiz {
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--radius-card);
+    background: var(--c-paper-2);
+    overflow: hidden;
+  }
+
+  .quiz__bar {
+    height: 2px;
+    background: var(--c-line);
+  }
+  .quiz__bar i {
+    display: block;
+    height: 100%;
+    width: 25%;
+    background: var(--c-signal);
+    transition: width 320ms var(--ease);
+  }
+
+  .quiz__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--c-line);
+    color: var(--c-steel);
+  }
+  .quiz__crumbs {
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--c-ink);
+  }
+
+  .quiz__stage {
+    position: relative;
+    padding: 22px 18px;
+    /* Высота под самый длинный шаг, чтобы страница не прыгала при переходах. */
+    min-height: 300px;
+  }
+
+  .qstep {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .qstep[hidden] {
+    display: none;
+  }
+  .qstep__q {
+    padding: 0;
+    margin-bottom: 18px;
+  }
+  .qstep__opts {
+    display: grid;
+    gap: 10px;
+  }
+
+  .opt {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'n l'
+      '. note';
+    align-items: center;
+    gap: 2px 12px;
+    text-align: left;
+    padding: 18px 46px 18px 16px;
+    background: var(--c-paper);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-card);
+    cursor: pointer;
+    transition:
+      border-color var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+  .opt::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 999px;
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+  .opt:hover {
+    border-color: var(--c-line-strong);
+    transform: translateY(-2px);
+  }
+  .opt[aria-checked='true'] {
+    border-color: var(--c-signal);
+  }
+  .opt[aria-checked='true']::after {
+    border-color: var(--c-signal);
+    box-shadow: inset 0 0 0 4px var(--c-signal);
+  }
+  .opt__n {
+    grid-area: n;
+    color: var(--c-steel);
+  }
+  .opt__l {
+    grid-area: l;
+    font-weight: 600;
+    font-size: clamp(16px, 1.6vw, 19px);
+    line-height: 1.2;
+  }
+  .opt__note {
+    grid-area: note;
+  }
+
+  .quiz__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 18px;
+    border-top: 1px solid var(--c-line);
+  }
+  .quiz__back {
+    background: none;
+    border: 0;
+    color: var(--c-steel);
+    cursor: pointer;
+    padding: 0;
+  }
+  .quiz__back:hover {
+    color: var(--c-ink);
+  }
+  .quiz__note {
+    max-width: 52ch;
+    text-align: right;
+    margin-left: auto;
+  }
+
+  /* ——— экран результата ———
+     Разметку результата собирает скрипт, поэтому scope-атрибута Astro
+     на этих узлах нет и обычные скоуп-селекторы по ним не отработают.
+     Оборачиваем в :global, но всегда от .qresult — инкапсуляция остаётся. */
+  .qresult[hidden] {
+    display: none;
+  }
+  .qresult :global(.qres__head) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .qresult :global(.qres__table) {
+    border-top: 1px solid var(--c-line-strong);
+  }
+  .qresult :global(.qrow) {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'n name price'
+      '. why why'
+      '. dose dose';
+    gap: 4px 12px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .qresult :global(.qrow__n) {
+    grid-area: n;
+    color: var(--c-steel);
+  }
+  .qresult :global(.qrow__name) {
+    grid-area: name;
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.25;
+  }
+  .qresult :global(.qrow__price) {
+    grid-area: price;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .qresult :global(.qrow__why) {
+    grid-area: why;
+    color: var(--c-steel);
+    font-size: 15px;
+  }
+  .qresult :global(.qrow__dose) {
+    grid-area: dose;
+    color: var(--c-ink);
+  }
+  .qresult :global(.qres__sum) {
+    display: grid;
+    gap: 10px;
+    padding-block: 18px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .qresult :global(.qres__sumrow) {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .qresult :global(.qres__sumrow b) {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: clamp(24px, 3.4vw, 38px);
+    letter-spacing: -0.03em;
+  }
+  .qresult :global(.qres__unit) {
+    font-size: 0.42em;
+    letter-spacing: 0.04em;
+    color: var(--c-steel);
+    text-transform: uppercase;
+  }
+  .qresult :global(.qres__note) {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-card);
+    color: var(--c-steel);
+    font-size: 15px;
+  }
+  .qresult :global(.qres__form) {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .qresult :global(.qres__actions) {
+    display: grid;
+    gap: 10px;
+  }
+  .qresult :global(.qres__legal) {
+    margin-top: 4px;
+  }
+  .qresult :global(.qres__restart) {
+    background: none;
+    border: 0;
+    color: var(--c-steel);
+    cursor: pointer;
+    padding: 0;
+    margin-top: 14px;
+    text-align: left;
+  }
+  .qresult :global(.qres__restart:hover) {
+    color: var(--c-ink);
+  }
+
+  @media (min-width: 760px) {
+    .quiz-sec {
+      padding-block: 80px;
+    }
+    .quiz__stage {
+      padding: 32px;
+      min-height: 268px;
+    }
+    .qstep__opts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .quiz__top,
+    .quiz__foot {
+      padding-inline: 32px;
+    }
+    .qresult :global(.qres__form) {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+    .qresult :global(.qres__actions) {
+      grid-template-columns: auto auto;
+    }
+  }
+  @media (max-width: 759px) {
+    .quiz__note {
+      display: none;
+    }
+  }
+</style>

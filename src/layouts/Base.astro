@@ -1,0 +1,164 @@
+---
+import '../styles/global.css';
+import { client } from '../config/client.config';
+import { faq } from '../data/content';
+import { asset } from '../lib/paths';
+
+// Шрифты импортируются, а не берутся из /public: Vite сам подставит
+// хеш и базовый путь, и preload не разъедется со сборкой.
+import onestCyrillic from '../assets/fonts/onest-cyrillic.woff2?url';
+import unboundedCyrillic from '../assets/fonts/unbounded-cyrillic.woff2?url';
+import monoLatin from '../assets/fonts/mono-latin.woff2?url';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Страницы-приложения (политика, доставка) не показывают плавашки. */
+  bare?: boolean;
+}
+
+const { title, description, bare = false } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.com').href;
+const ogImage = new URL(asset('/demo/og.webp'), Astro.site ?? 'https://example.com').href;
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'Store',
+  name: client.name,
+  description: `Магазин спортивного питания ${client.cityIn}: протеин, креатин, аминокислоты, витамины. Подбор под цель, самовывоз за ${client.hero.pickupMinutes} минут.`,
+  image: ogImage,
+  url: canonical,
+  telephone: client.contacts.phone,
+  priceRange: '₽₽',
+  foundingDate: String(client.foundedYear),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: client.contacts.address,
+    addressLocality: client.city,
+    addressCountry: 'RU',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: client.contacts.mapCoords[0],
+    longitude: client.contacts.mapCoords[1],
+  },
+  openingHours: ['Mo-Sa 10:00-20:00', 'Su 11:00-18:00'],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: client.stats.rating,
+    reviewCount: client.stats.customers,
+    bestRating: 5,
+  },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
+---
+
+<!doctype html>
+<html
+  lang="ru"
+  data-theme={client.theme}
+  data-metrika={client.metrika || undefined}
+  style={`--c-accent: ${client.accent};`}
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content={client.theme === 'dark' ? '#0E1013' : '#EFEEE9'} />
+
+    <!-- Кириллица грузится первой: на ней набрана вся страница.
+         Латиница нужна почти сразу — в ней лежат цифры. -->
+    <link rel="preload" href={onestCyrillic} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={unboundedCyrillic} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoLatin} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={client.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="ru_RU" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href={asset('/favicon.svg')} type="image/svg+xml" />
+
+    <!-- Ставим класс до первой отрисовки: reveal-элементы прячутся только
+         при живом JS, иначе страница без скриптов останется читаемой. -->
+    <script is:inline>
+      (function () {
+        var r = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.documentElement.classList.add(r ? 'js-static' : 'js-motion');
+      })();
+    </script>
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(localBusiness)}
+      is:inline
+    />
+    {
+      !bare && (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(faqSchema)}
+          is:inline
+        />
+      )
+    }
+  </head>
+
+  <body>
+    <a href="#main" class="skip">К основному содержанию</a>
+    <slot />
+
+    <script>
+      // Движение подключается одним модулем и только если пользователь его не выключил.
+      import '../scripts/motion';
+    </script>
+
+    {
+      client.metrika > 0 && (
+        <script is:inline define:vars={{ id: client.metrika }}>
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();for(var j=0;j<e.length;j++){if(e[j]===k){return}}
+          k=t.createElement(r),a=t.getElementsByTagName(r)[0];k.async=1;k.src="https://mc.yandex.ru/metrika/tag.js";
+          a.parentNode.insertBefore(k,a)})(window,document.scripts,document,"script","ym");
+          ym(id,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});`}
+        </script>
+      )
+    }
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 100;
+    padding: 12px 18px;
+    background: var(--c-signal);
+    color: var(--c-on-signal);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-decoration: none;
+    transition: top 160ms ease;
+  }
+  .skip:focus {
+    top: 12px;
+  }
+</style>

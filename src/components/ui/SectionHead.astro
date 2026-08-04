@@ -1,0 +1,55 @@
+---
+/**
+ * Разделитель секции: моноширинный номер, название, хайрлайн и правая метка.
+ * Страница читается как одна панель состава сверху вниз — отсюда нумерация.
+ *
+ *   03 / КАТЕГОРИИ ————————————————————— 6 ПОЗИЦИЙ
+ */
+interface Props {
+  n: string;
+  title: string;
+  meta?: string;
+  class?: string;
+}
+const { n, title, meta, class: cls = '' } = Astro.props;
+---
+
+<div class={`sec-head t-data ${cls}`} data-reveal="fade">
+  <span class="sec-head__n">{n}</span>
+  <span class="sec-head__slash" aria-hidden="true">/</span>
+  <span class="sec-head__title">{title}</span>
+  <span class="sec-head__rule" aria-hidden="true"></span>
+  {meta && <span class="sec-head__meta">{meta}</span>}
+</div>
+
+<style>
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-block: 14px;
+    border-top: 1px solid var(--c-line);
+    color: var(--c-ink);
+  }
+  .sec-head__n {
+    color: var(--c-steel);
+  }
+  .sec-head__slash {
+    color: var(--c-steel);
+  }
+  .sec-head__rule {
+    flex: 1;
+    height: 1px;
+    background: var(--c-line);
+    min-width: 24px;
+  }
+  .sec-head__meta {
+    color: var(--c-steel);
+    white-space: nowrap;
+  }
+  @media (max-width: 560px) {
+    .sec-head__meta {
+      display: none;
+    }
+  }
+</style>

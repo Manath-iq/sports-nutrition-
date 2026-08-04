@@ -1,0 +1,70 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { client } from '../config/client.config';
+import { stats } from '../data/content';
+---
+
+<section class="sec stats-sec">
+  <div class="wrap">
+    <SectionHead n="09" title="Цифры магазина" meta={`${client.city}`} />
+
+    <h2 class="t-h2 stats__h" data-reveal="lines">{client.city} нас уже знает</h2>
+
+    <!-- Панель состава: ячейки в ряд, разделённые вертикальными хайрлайнами. -->
+    <div class="stats" data-reveal-group>
+      {
+        stats.map((s) => (
+          <div class="stat">
+            <span
+              class="num-display"
+              data-count={s.value}
+              data-decimals={s.decimals ?? 0}
+            >
+              0
+            </span>
+            <span class="num-unit">
+              {s.unit[0]}
+              <br />
+              {s.unit[1]}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .stats-sec {
+    padding-block: 56px;
+  }
+  .stats__h {
+    margin-block: 28px 32px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--c-line-strong);
+    border-left: 1px solid var(--c-line);
+  }
+  .stat {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    padding: 22px 16px;
+    border-right: 1px solid var(--c-line);
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  @media (min-width: 760px) {
+    .stats-sec {
+      padding-block: 80px;
+    }
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .stat {
+      padding: 32px 24px 36px;
+    }
+  }
+</style>

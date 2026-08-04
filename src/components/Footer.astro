@@ -1,0 +1,155 @@
+---
+import { client, currentYear, telLink, waLink } from '../config/client.config';
+import { categories } from '../data/categories';
+import { link } from '../lib/paths';
+---
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr__grid">
+      <div class="ftr__col ftr__brand">
+        <span class="ftr__logo">{client.name}</span>
+        <p class="t-micro ftr__about">
+          Магазин спортивного питания {client.cityIn} с {client.foundedYear} года. Подбираем
+          под цель, а не продаём по списку.
+        </p>
+      </div>
+
+      <nav class="ftr__col" aria-label="Категории">
+        <p class="t-data ftr__k">Каталог</p>
+        <ul class="ftr__list">
+          {
+            categories.map((c) => (
+              <li>
+                <a href="#categories" class="link-rule">
+                  {c.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav class="ftr__col" aria-label="Информация">
+        <p class="t-data ftr__k">Информация</p>
+        <ul class="ftr__list">
+          <li><a href={link("/delivery")} class="link-rule">Доставка и оплата</a></li>
+          <li><a href={link("/delivery#returns")} class="link-rule">Возврат товара</a></li>
+          <li><a href="#guarantee" class="link-rule">Проверка оригинальности</a></li>
+          <li><a href={link("/privacy")} class="link-rule">Политика обработки ПДн</a></li>
+        </ul>
+      </nav>
+
+      <div class="ftr__col">
+        <p class="t-data ftr__k">Контакты</p>
+        <ul class="ftr__list">
+          <li><a href={telLink} class="link-rule" data-goal="phone_click">{client.contacts.phone}</a></li>
+          <li>
+            <a href={waLink()} class="link-rule" target="_blank" rel="noopener" data-goal="wa_click">
+              WhatsApp
+            </a>
+          </li>
+          <li>{client.contacts.address}</li>
+          <li class="t-micro">{client.contacts.hours}</li>
+        </ul>
+        <div class="ftr__social">
+          {client.contacts.social.vk && <a href={client.contacts.social.vk} class="chip" target="_blank" rel="noopener">ВК</a>}
+          {client.contacts.social.telegram && <a href={client.contacts.social.telegram} class="chip" target="_blank" rel="noopener">Telegram</a>}
+          {client.contacts.social.twoGis && <a href={client.contacts.social.twoGis} class="chip" target="_blank" rel="noopener">2ГИС</a>}
+        </div>
+      </div>
+    </div>
+
+    <!-- Обязательная строка. Без неё сайт не пройдёт модерацию рекламы. -->
+    <p class="ftr__disclaimer t-micro">
+      БАД. Не является лекарственным средством. Имеются противопоказания, необходима
+      консультация специалиста.{!client.legal.isOffer && ' Не является публичной офертой.'}
+    </p>
+
+    <div class="ftr__bottom t-micro">
+      <span>{client.legal.entity}, ИНН {client.legal.inn}</span>
+      <span>© {currentYear} {client.name}</span>
+      <a href={link("/privacy")} class="link-rule">Политика обработки персональных данных</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    padding-block: 48px 32px;
+    border-top: 1px solid var(--c-line);
+  }
+  .ftr__grid {
+    display: grid;
+    gap: 32px;
+  }
+  .ftr__logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .ftr__about {
+    max-width: 34ch;
+  }
+  .ftr__k {
+    color: var(--c-steel);
+    margin-bottom: 14px;
+  }
+  .ftr__list {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    font-size: 15px;
+  }
+  .ftr__list a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .ftr__social {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .ftr__social .chip {
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .ftr__social .chip:hover {
+    border-color: var(--c-signal);
+    color: var(--c-signal);
+  }
+
+  .ftr__disclaimer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--c-line);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+    max-width: 80ch;
+  }
+  .ftr__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--c-line);
+  }
+  .ftr__bottom a {
+    color: inherit;
+  }
+
+  @media (min-width: 760px) {
+    .ftr {
+      padding-block: 72px 40px;
+    }
+    .ftr__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.1fr;
+      gap: 40px;
+    }
+  }
+</style>

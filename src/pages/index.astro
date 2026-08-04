@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Brands from '../components/Brands.astro';
+import Categories from '../components/Categories.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import Quiz from '../components/Quiz.astro';
+import Bestsellers from '../components/Bestsellers.astro';
+import Calculator from '../components/Calculator.astro';
+import Guarantee from '../components/Guarantee.astro';
+import Stats from '../components/Stats.astro';
+import Store from '../components/Store.astro';
+import Reviews from '../components/Reviews.astro';
+import Consult from '../components/Consult.astro';
+import Delivery from '../components/Delivery.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+import Footer from '../components/Footer.astro';
+import OrderBar from '../components/OrderBar.astro';
+import WhatsAppFab from '../components/WhatsAppFab.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+import { client } from '../config/client.config';
+
+const title = `Спортивное питание ${client.cityIn} — ${client.name}`;
+const description = `Протеин, креатин, аминокислоты и витамины ${client.cityIn}. Подберём набор под вашу цель за минуту, самовывоз за ${client.hero.pickupMinutes} минут, проверка оригинальности по коду производителя.`;
+---
+
+<Base title={title} description={description}>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Brands />
+    <Categories />
+    <HowItWorks />
+    <Quiz />
+    <Bestsellers />
+    <Calculator />
+    <Guarantee />
+    <Stats />
+    <Store />
+    <Reviews />
+    <Consult />
+    <Delivery />
+    <Faq />
+    <FinalCta />
+  </main>
+  <Footer />
+  <OrderBar />
+  <WhatsAppFab />
+  <CookieBanner />
+</Base>

@@ -1,0 +1,168 @@
+---
+import { client } from '../config/client.config';
+import { link } from '../lib/paths';
+---
+
+<!-- Единственное тёмное место на странице — поэтому оно и работает. -->
+<section class="fcta invert-panel" id="order">
+  <div class="wrap fcta__in">
+    <p class="t-data fcta__brow" data-reveal="fade">15 / Заявка</p>
+
+    <h2 class="t-h2 fcta__h" data-reveal="lines">Напишите цель — соберём набор сегодня</h2>
+
+    <p class="t-body fcta__sub" data-reveal="fade">
+      Ответим в WhatsApp в течение 15 минут в рабочее время. Если добавки не нужны —
+      так и скажем.
+    </p>
+
+    <form class="fcta__form" data-final-form novalidate>
+      <label class="sr-only-x" for="cta-name">Имя</label>
+      <input class="field" id="cta-name" name="name" placeholder="Имя" autocomplete="given-name" />
+
+      <label class="sr-only-x" for="cta-phone">Телефон</label>
+      <input
+        class="field"
+        id="cta-phone"
+        name="phone"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        placeholder="+7 (___) ___-__-__"
+        data-final-phone
+      />
+
+      <button type="submit" class="btn btn-signal" data-goal="form_submit">Отправить</button>
+
+      <p class="t-micro fcta__legal">
+        Нажимая кнопку, вы соглашаетесь с
+        <a href={link("/privacy")} class="link-rule">политикой обработки персональных данных</a>.
+      </p>
+      <p class="t-micro fcta__status" data-final-status role="status"></p>
+    </form>
+
+    <p class="t-micro fcta__disclaimer">
+      БАД. Не является лекарственным средством. Имеются противопоказания, необходима
+      консультация специалиста.
+    </p>
+  </div>
+</section>
+
+<!-- Конфиг пробрасывается инлайн: обработчик ниже собирается сборщиком,
+     а define:vars работает только с необработанными скриптами. -->
+<script is:inline define:vars={{ formspree: client.forms.formspreeId, whatsapp: client.contacts.whatsapp }}>
+  window.__formConfig = { formspree, whatsapp };
+</script>
+
+<script>
+  import { maskPhone, isPhoneComplete, goal } from '../scripts/phone';
+
+  const form = document.querySelector<HTMLFormElement>('[data-final-form]');
+  const phone = document.querySelector<HTMLInputElement>('[data-final-phone]');
+  const status = document.querySelector<HTMLElement>('[data-final-status]');
+  const cfg = (window as unknown as { __formConfig: { formspree: string; whatsapp: string } })
+    .__formConfig;
+
+  if (form && phone) {
+    maskPhone(phone);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isPhoneComplete(phone.value)) {
+        phone.setAttribute('aria-invalid', 'true');
+        phone.focus();
+        if (status) status.textContent = 'Проверьте номер телефона — не хватает цифр.';
+        return;
+      }
+
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '').trim();
+      const text = [
+        'Заявка с сайта.',
+        name ? `Имя: ${name}` : '',
+        `Телефон: ${phone.value}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+      goal('form_submit');
+
+      // Без бэкенда: если Formspree не подключён, заявка уходит в WhatsApp.
+      if (cfg.formspree) {
+        if (status) status.textContent = 'Отправляем…';
+        try {
+          const res = await fetch(`https://formspree.io/f/${cfg.formspree}`, {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: data,
+          });
+          if (!res.ok) throw new Error('bad status');
+          form.reset();
+          if (status) status.textContent = 'Приняли. Позвоним или напишем в ближайшее время.';
+          return;
+        } catch {
+          if (status)
+            status.textContent = 'Не получилось отправить — открываем WhatsApp.';
+        }
+      }
+
+      window.open(
+        `https://wa.me/${cfg.whatsapp}?text=${encodeURIComponent(text)}`,
+        '_blank',
+        'noopener',
+      );
+      if (status) status.textContent = 'Открыли WhatsApp — отправьте сообщение, мы ответим.';
+    });
+  }
+</script>
+
+<style>
+  .fcta {
+    padding-block: 72px;
+    margin-top: 24px;
+  }
+  .fcta__in {
+    display: grid;
+    gap: 0;
+  }
+  .fcta__brow {
+    color: var(--c-steel);
+    margin-bottom: 24px;
+  }
+  .fcta__h {
+    max-width: 18ch;
+    margin-bottom: 20px;
+  }
+  .fcta__sub {
+    color: color-mix(in srgb, var(--c-ink) 76%, transparent);
+    margin-bottom: 32px;
+  }
+  .fcta__form {
+    display: grid;
+    gap: 10px;
+    max-width: 760px;
+  }
+  .fcta__legal,
+  .fcta__status {
+    grid-column: 1 / -1;
+    max-width: 60ch;
+  }
+  .fcta__status:empty {
+    display: none;
+  }
+  .fcta__disclaimer {
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    max-width: 62ch;
+  }
+
+  @media (min-width: 760px) {
+    .fcta {
+      padding-block: 110px;
+    }
+    .fcta__form {
+      grid-template-columns: 1fr 1fr auto;
+      align-items: start;
+    }
+  }
+</style>

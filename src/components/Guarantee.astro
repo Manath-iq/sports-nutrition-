@@ -1,0 +1,148 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { guaranteeSteps } from '../data/content';
+import { asset } from '../lib/paths';
+---
+
+<section class="sec guar" id="guarantee">
+  <div class="wrap">
+    <SectionHead n="08" title="Оригинальность" meta="Проверка при вас" />
+
+    <div class="guar__grid">
+      <!-- Фото-стопка: код на банке, экран проверки, коробка с накладной. -->
+      <div class="guar__stack" data-reveal="fade">
+        <figure class="guar__ph guar__ph--1">
+          <img src={asset("/demo/guarantee-1.webp")} alt="Защитный код на банке протеина" width="640" height="460" loading="lazy" decoding="async" />
+        </figure>
+        <figure class="guar__ph guar__ph--2">
+          <img src={asset("/demo/guarantee-2.webp")} alt="Проверка кода на сайте производителя" width="560" height="400" loading="lazy" decoding="async" />
+        </figure>
+        <figure class="guar__ph guar__ph--3">
+          <img src={asset("/demo/guarantee-3.webp")} alt="Собранный заказ с накладной" width="520" height="380" loading="lazy" decoding="async" />
+        </figure>
+      </div>
+
+      <div class="guar__text">
+        <p class="t-data guar__brow" data-reveal="fade">Гарантия</p>
+        <h2 class="t-h2 guar__h" data-reveal="lines">Каждую банку можно проверить при вас</h2>
+        <p class="t-body guar__p" data-reveal="fade">
+          Мы возим только от официальных дистрибьюторов. На банке есть защитный код
+          производителя — сотрите слой и пробейте его на сайте бренда прямо в магазине,
+          у кассы. Если код не проходит, забираем товар и возвращаем деньги в тот же день.
+        </p>
+
+        <ol class="guar__steps" data-reveal-group>
+          {
+            guaranteeSteps.map((s) => (
+              <li class="guar__step">
+                <span class="t-data guar__n">{s.n}</span>
+                <span>{s.text}</span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <p class="t-micro guar__legal">
+          На всю продукцию есть свидетельства о государственной регистрации и декларации
+          соответствия — покажем по запросу.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .guar__grid {
+    display: grid;
+    gap: 32px;
+    margin-top: 28px;
+  }
+
+  .guar__stack {
+    position: relative;
+    display: grid;
+    gap: 12px;
+  }
+  .guar__ph {
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background: var(--c-paper-2);
+  }
+  .guar__ph img {
+    width: 100%;
+    height: auto;
+  }
+
+  .guar__brow {
+    color: var(--c-steel);
+    margin-bottom: 16px;
+  }
+  .guar__h {
+    --h2-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 20px;
+  }
+  .guar__p {
+    color: color-mix(in srgb, var(--c-ink) 80%, transparent);
+    margin-bottom: 28px;
+  }
+  .guar__steps {
+    list-style: none;
+    border-top: 1px solid var(--c-line);
+    margin-bottom: 20px;
+  }
+  .guar__step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    align-items: baseline;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--c-line);
+    font-size: 17px;
+  }
+  .guar__n {
+    color: var(--c-steel);
+  }
+  .guar__legal {
+    max-width: 56ch;
+  }
+
+  @media (min-width: 900px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .guar__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+    /* Стопка: снимки лежат внахлёст, как на столе у кассы. */
+    .guar__stack {
+      display: block;
+      height: 520px;
+    }
+    .guar__ph {
+      position: absolute;
+    }
+    .guar__ph--1 {
+      width: 76%;
+      top: 0;
+      left: 0;
+      z-index: 3;
+    }
+    .guar__ph--2 {
+      width: 58%;
+      top: 190px;
+      right: 0;
+      z-index: 2;
+    }
+    .guar__ph--3 {
+      width: 50%;
+      bottom: 0;
+      left: 6%;
+      z-index: 1;
+    }
+  }
+</style>

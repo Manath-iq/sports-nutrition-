@@ -1,0 +1,279 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { client } from '../config/client.config';
+import { hits } from '../data/products';
+import { asset } from '../lib/paths';
+---
+
+<section class="sec best" id="hits">
+  <div class="wrap">
+    <SectionHead n="06" title="Хиты продаж" meta={`${hits.length} позиций`} />
+
+    <div class="best__head">
+      <div>
+        <h2 class="t-h2" data-reveal="lines">Разбирают быстрее всего</h2>
+        <p class="t-micro best__sub" data-reveal="fade">
+          Цены актуальны на {client.pricesActualAt} · наличие уточняйте
+          {!client.legal.isOffer && ' · не является публичной офертой'}
+        </p>
+      </div>
+      <div class="best__arrows">
+        <button type="button" class="arrow" data-lane-prev aria-label="Предыдущие товары">
+          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"
+            ><path d="M16 10H4M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.5"
+            ></path></svg
+          >
+        </button>
+        <button type="button" class="arrow" data-lane-next aria-label="Следующие товары">
+          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"
+            ><path d="M4 10h12M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"
+            ></path></svg
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Лента выходит за контейнер: край экрана обрезает карточку и намекает,
+       что справа есть ещё. Автокарусели нет — только жест и стрелки. -->
+  <div class="lane no-bar" data-lane>
+    {
+      hits.map((p) => (
+        <article class="card">
+          <div class="card__media ph">
+            <img src={asset(p.img)} alt={p.alt} width="480" height="480" loading="lazy" decoding="async" />
+            {p.badge && (
+              <span class={`card__badge t-micro ${p.badge.tone === 'heat' ? 'is-heat' : ''}`}>
+                {p.badge.text}
+              </span>
+            )}
+          </div>
+
+          <div class="card__body">
+            <h3 class="card__name">{p.name}</h3>
+            <p class="t-micro card__data">{p.data.join(' · ')}</p>
+
+            <div class="card__flavors">
+              {p.flavors.slice(0, 3).map((f) => (
+                <span class="chip">{f}</span>
+              ))}
+              {p.flavors.length > 3 && (
+                <span class="chip">ещё {p.flavors.length - 3}</span>
+              )}
+            </div>
+
+            <div class="card__foot">
+              <p class="card__price">
+                {p.price.toLocaleString('ru-RU')} ₽
+                {p.oldPrice && <s class="card__old">{p.oldPrice.toLocaleString('ru-RU')} ₽</s>}
+              </p>
+              <button type="button" class="btn btn-sm btn-outline card__add" data-add={p.id}>
+                <span data-add-label>В заказ</span>
+              </button>
+            </div>
+          </div>
+        </article>
+      ))
+    }
+    <div class="lane__pad" aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .best__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-block: 28px 28px;
+  }
+  .best__sub {
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+  .best__arrows {
+    display: none;
+    gap: 8px;
+  }
+  .arrow {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+  .arrow:hover {
+    color: var(--c-signal);
+    border-color: var(--c-signal);
+  }
+  .arrow[disabled] {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .lane {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-block: 4px 8px;
+    cursor: grab;
+  }
+  .lane[data-dragging='true'] {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+  }
+  /* Начальный отступ даёт padding, конечный — распорка: end-padding
+     у горизонтальных скролл-контейнеров теряется в части браузеров. */
+  .lane {
+    padding-inline-start: var(--gutter);
+  }
+  .lane__pad {
+    flex: none;
+    width: 1px;
+    margin-inline-end: var(--gutter);
+  }
+
+  .card {
+    flex: none;
+    width: min(78vw, 300px);
+    scroll-snap-align: start;
+    background: var(--c-paper-2);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform var(--dur) var(--ease);
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--c-signal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
+  }
+  .card:hover {
+    transform: translateY(-4px);
+  }
+  .card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .card__media {
+    position: relative;
+    aspect-ratio: 1;
+  }
+  .card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .card__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--c-paper);
+    border: 1px solid var(--c-line-strong);
+    color: var(--c-ink);
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  /* Оранжевый — только «мало осталось». Ни на чём другом его нет.
+     Текст бейджа мелкий, поэтому берёт затемнённый тон сигнала. */
+  .card__badge.is-heat {
+    color: var(--c-heat-ink);
+    border-color: var(--c-heat);
+  }
+
+  .card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border-top: 1px solid var(--c-line);
+    flex: 1;
+  }
+  .card__name {
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.25;
+  }
+  .card__data {
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  .card__flavors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .card__flavors .chip {
+    height: 26px;
+    padding-inline: 10px;
+    font-size: 11px;
+    text-transform: none;
+  }
+  .card__foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 4px;
+  }
+  .card__price {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    display: flex;
+    flex-direction: column;
+  }
+  .card__old {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--c-steel);
+    letter-spacing: 0;
+  }
+  .card__add[data-state='in'] {
+    border-color: var(--c-signal);
+    color: var(--c-signal);
+  }
+
+  @media (min-width: 900px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .best__arrows {
+      display: flex;
+    }
+    .lane {
+      gap: 16px;
+    }
+  }
+</style>
+
+<script>
+  import { initLane } from '../scripts/lane';
+  initLane();
+</script>

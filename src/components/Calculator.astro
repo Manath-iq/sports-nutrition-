@@ -1,0 +1,375 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+
+const activities = [
+  { v: '1.2', l: 'Сидячая', note: 'Без тренировок' },
+  { v: '1.375', l: '1–2 раза', note: 'В неделю' },
+  { v: '1.55', l: '3–4 раза', note: 'В неделю' },
+  { v: '1.725', l: '5+ раз', note: 'В неделю' },
+];
+
+const goals = [
+  { v: '1.6', l: 'Поддержание' },
+  { v: '1.8', l: 'Набор массы' },
+  { v: '2.0', l: 'Снижение веса' },
+];
+---
+
+<section class="sec calc-sec" id="calc">
+  <div class="wrap">
+    <SectionHead n="07" title="Калькулятор белка" meta="Расчёт в браузере" />
+
+    <div class="calc__head">
+      <h2 class="t-h2" data-reveal="lines">Сколько белка вы недобираете</h2>
+      <p class="t-body calc__sub" data-reveal="fade">
+        Считаем по формуле Миффлина–Сан Жеора — той же, что используют диетологи. Данные никуда
+        не отправляются, расчёт идёт прямо в браузере.
+      </p>
+    </div>
+
+    <div class="calc" data-calc>
+      <form class="calc__form" data-calc-form>
+        <div class="calc__seg">
+          <span class="t-data calc__legend">Пол</span>
+          <div class="seg" role="radiogroup" aria-label="Пол">
+            <button type="button" class="seg__btn" role="radio" aria-checked="true" data-sex="m">
+              Мужской
+            </button>
+            <button type="button" class="seg__btn" role="radio" aria-checked="false" data-sex="f">
+              Женский
+            </button>
+          </div>
+        </div>
+
+        <div class="calc__ranges">
+          <label class="rng">
+            <span class="t-data rng__label">Возраст</span>
+            <output class="rng__out num" data-out="age">30</output>
+            <span class="rng__unit t-micro">лет</span>
+            <input type="range" min="14" max="80" step="1" value="30" data-in="age" aria-label="Возраст, лет" />
+          </label>
+
+          <label class="rng">
+            <span class="t-data rng__label">Рост</span>
+            <output class="rng__out num" data-out="height">178</output>
+            <span class="rng__unit t-micro">см</span>
+            <input type="range" min="140" max="220" step="1" value="178" data-in="height" aria-label="Рост, см" />
+          </label>
+
+          <label class="rng">
+            <span class="t-data rng__label">Вес</span>
+            <output class="rng__out num" data-out="weight">78</output>
+            <span class="rng__unit t-micro">кг</span>
+            <input type="range" min="40" max="160" step="1" value="78" data-in="weight" aria-label="Вес, кг" />
+          </label>
+        </div>
+
+        <div class="calc__seg">
+          <span class="t-data calc__legend">Тренировки</span>
+          <div class="seg seg--4" role="radiogroup" aria-label="Активность">
+            {
+              activities.map((a, i) => (
+                <button
+                  type="button"
+                  class="seg__btn"
+                  role="radio"
+                  aria-checked={i === 2 ? 'true' : 'false'}
+                  data-act={a.v}
+                >
+                  {a.l}
+                  <span class="t-micro seg__note">{a.note}</span>
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="calc__seg">
+          <span class="t-data calc__legend">Цель</span>
+          <div class="seg seg--3" role="radiogroup" aria-label="Цель">
+            {
+              goals.map((g, i) => (
+                <button
+                  type="button"
+                  class="seg__btn"
+                  role="radio"
+                  aria-checked={i === 0 ? 'true' : 'false'}
+                  data-goal-k={g.v}
+                >
+                  {g.l}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+      </form>
+
+      <!-- Единственное место на странице, где появляется оранжевый:
+           это число посчитано лично для посетителя. -->
+      <output class="calc__out" data-calc-out aria-live="polite">
+        <div class="calc__pair">
+          <div class="calc__cell">
+            <span class="t-data calc__k">Ваша норма белка</span>
+            <span class="num-display is-heat" data-r="need">140</span>
+            <span class="num-unit">г в сутки</span>
+          </div>
+          <div class="calc__cell">
+            <span class="t-data calc__k">Обычный рацион даёт</span>
+            <span class="num-display" data-r="usual">78</span>
+            <span class="num-unit">г из еды</span>
+          </div>
+        </div>
+
+        <div class="calc__diff">
+          <div class="calc__diffrow">
+            <span class="t-data">Разница</span>
+            <span class="num calc__big is-heat"><span data-r="diff">62</span><span class="calc__u">г</span></span>
+          </div>
+          <div class="calc__diffrow">
+            <span class="t-data">Это примерно</span>
+            <span class="num calc__mid" data-r="scoops">3 порции протеина</span>
+          </div>
+          <div class="calc__diffrow">
+            <span class="t-data">Стоит в день</span>
+            <span class="num calc__mid" data-r="cost">289 ₽</span>
+          </div>
+          <div class="calc__diffrow calc__diffrow--soft">
+            <span class="t-data">Суточная калорийность</span>
+            <span class="num calc__mid" data-r="kcal">2 640 ккал</span>
+          </div>
+        </div>
+
+        <a href="#hits" class="btn btn-signal calc__cta" data-goal="calc_complete">
+          Показать протеины с нужной порцией
+        </a>
+      </output>
+    </div>
+
+    <p class="t-micro calc__legal">
+      Расчёт ориентировочный и не заменяет консультацию врача или диетолога. При хронических
+      заболеваниях норму белка определяет специалист.
+    </p>
+  </div>
+</section>
+
+<script>
+  import { initCalculator } from '../scripts/calculator';
+  initCalculator();
+</script>
+
+<style>
+  .calc-sec {
+    padding-block: 56px;
+  }
+  .calc__head {
+    display: grid;
+    gap: 16px;
+    margin-block: 28px 32px;
+  }
+  .calc__sub {
+    color: var(--c-steel);
+  }
+
+  .calc {
+    display: grid;
+    gap: 0;
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  .calc__form {
+    display: grid;
+    gap: 22px;
+    padding: 22px 18px;
+    background: var(--c-paper);
+  }
+  .calc__legend {
+    color: var(--c-steel);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .seg {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  /* На узком экране три подписи в ряд не помещаются и наезжают друг
+     на друга — раскладываем в столбик, заодно удобнее большим пальцем. */
+  .seg--3 {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 520px) {
+    .seg--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .seg--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .seg__btn {
+    display: grid;
+    gap: 2px;
+    padding: 12px 10px;
+    background: transparent;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-card);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition:
+      border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+  .seg__btn[aria-checked='true'] {
+    border-color: var(--c-signal);
+    color: var(--c-signal);
+  }
+  .seg__note {
+    color: var(--c-steel);
+  }
+  .seg__btn[aria-checked='true'] .seg__note {
+    color: color-mix(in srgb, var(--c-signal) 70%, var(--c-steel));
+  }
+
+  .calc__ranges {
+    display: grid;
+    gap: 18px;
+  }
+  .rng {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .rng__label {
+    color: var(--c-steel);
+  }
+  .rng__out {
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .rng__unit {
+    text-transform: uppercase;
+  }
+  .rng input[type='range'] {
+    grid-column: 1 / -1;
+    width: 100%;
+    appearance: none;
+    height: 2px;
+    background: var(--c-line-strong);
+    margin-top: 12px;
+    cursor: pointer;
+  }
+  .rng input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--c-signal);
+    border: 3px solid var(--c-paper);
+    box-shadow: 0 0 0 1px var(--c-signal);
+  }
+  .rng input[type='range']::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--c-signal);
+    border: 3px solid var(--c-paper);
+  }
+
+  .calc__out {
+    display: block;
+    padding: 22px 18px;
+    background: var(--c-paper-2);
+    border-top: 1px solid var(--c-line-strong);
+  }
+  .calc__pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--c-line-strong);
+  }
+  .calc__cell {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+  }
+  .calc__k {
+    color: var(--c-steel);
+  }
+  .is-heat {
+    color: var(--c-heat);
+  }
+
+  .calc__diff {
+    display: grid;
+    padding-block: 4px;
+  }
+  .calc__diffrow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 14px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .calc__diffrow--soft {
+    color: var(--c-steel);
+  }
+  .calc__u {
+    font-size: 0.4em;
+    letter-spacing: 0.04em;
+    color: var(--c-steel);
+    margin-left: 6px;
+    text-transform: uppercase;
+  }
+  .calc__big {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .calc__mid {
+    font-size: clamp(15px, 1.6vw, 18px);
+    font-weight: 500;
+  }
+  .calc__cta {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .calc__legal {
+    margin-top: 14px;
+    max-width: 70ch;
+  }
+
+  @media (min-width: 900px) {
+    .calc-sec {
+      padding-block: 80px;
+    }
+    .calc {
+      grid-template-columns: 1.05fr 1fr;
+    }
+    .calc__form {
+      padding: 32px;
+    }
+    .calc__out {
+      padding: 32px;
+      border-top: 0;
+      border-left: 1px solid var(--c-line-strong);
+    }
+    .seg--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .calc__cta {
+      width: auto;
+    }
+  }
+</style>

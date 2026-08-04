@@ -1,0 +1,28 @@
+---
+/**
+ * Раскрытие текста по словам, разбитое на сервере.
+ * Нужно там, где нельзя ждать скрипты — прежде всего H1 первого экрана:
+ * это LCP-элемент, и он обязан появиться без участия JS.
+ */
+export interface Props {
+  text: string;
+  class?: string;
+  as?: 'h1' | 'h2' | 'p' | 'span';
+}
+
+const { text, class: cls = '', as: Tag = 'span' } = Astro.props as Props;
+const words: string[] = text.split(' ');
+---
+
+<Tag class={cls}>
+  {
+    words.map((word: string, i: number) => (
+      <>
+        <span class="rise" style={`--i:${i}`}>
+          <span>{word}</span>
+        </span>
+        {i < words.length - 1 ? ' ' : ''}
+      </>
+    ))
+  }
+</Tag>

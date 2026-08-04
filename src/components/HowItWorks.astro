@@ -1,0 +1,87 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { steps } from '../data/content';
+---
+
+<section class="sec how">
+  <div class="wrap">
+    <SectionHead n="04" title="Как это работает" meta="3 шага" />
+
+    <h2 class="t-h2 how__h" data-reveal="lines">Три шага, ноль лишних разговоров</h2>
+
+    <!-- Шаги набраны строками таблицы, а не карточками: страница — панель состава. -->
+    <ol class="how__list" data-reveal-group>
+      {
+        steps.map((s) => (
+          <li class="how__row">
+            <span class="how__n t-data">{s.n}</span>
+            <span class="how__rule" aria-hidden="true" />
+            <span class="how__title t-data">{s.title}</span>
+            <span class="how__text">{s.text}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .how__h {
+    margin-block: 28px 32px;
+  }
+  .how__list {
+    list-style: none;
+    border-top: 1px solid var(--c-line);
+  }
+  .how__row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'n title'
+      'text text';
+    align-items: center;
+    gap: 6px 14px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .how__n {
+    grid-area: n;
+    color: var(--c-steel);
+  }
+  .how__rule {
+    display: none;
+    height: 1px;
+    background: var(--c-line-strong);
+  }
+  .how__title {
+    grid-area: title;
+  }
+  .how__text {
+    grid-area: text;
+    color: var(--c-steel);
+    font-size: 16px;
+  }
+
+  @media (min-width: 760px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .how__row {
+      grid-template-columns: 52px 88px 220px 1fr;
+      grid-template-areas: 'n rule title text';
+      gap: 24px;
+      padding-block: 26px;
+    }
+    .how__rule {
+      display: block;
+      grid-area: rule;
+    }
+    .how__text {
+      font-size: 18px;
+      color: var(--c-ink);
+    }
+  }
+</style>

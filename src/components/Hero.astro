@@ -1,0 +1,316 @@
+---
+import { client } from '../config/client.config';
+import { heroTitles } from '../data/content';
+import RiseText from './ui/RiseText.astro';
+import { asset } from '../lib/paths';
+
+const title = heroTitles[client.hero.variant] ?? heroTitles[1];
+const positions = client.hero.positions.toLocaleString('ru-RU');
+---
+
+<section class="hero" id="top" data-hero>
+  <div class="hero__rules" aria-hidden="true"></div>
+
+  <div class="wrap hero__grid">
+    <div class="hero__text">
+      <p class="t-data hero__brow fade-up" style="--d:0">
+        Спортивное питание · {client.city} · с {client.foundedYear}
+      </p>
+
+      <div class="hero__h1">
+        <RiseText as="h1" class="t-h1" text={title} />
+      </div>
+
+      <p class="t-body hero__sub fade-up" style="--d:420">
+        Отвечаете на 4 вопроса — получаете список из 2–3 добавок с ценами и дозировками.
+        Без переплаты за бренд и без лишних банок на полке.
+      </p>
+
+      <div class="hero__cta fade-up" style="--d:520">
+        <a href="#quiz" class="btn btn-signal" data-goal="quiz_start">Подобрать питание</a>
+        <a href="#categories" class="btn btn-outline">Смотреть каталог</a>
+      </div>
+
+      <p class="t-micro hero__facts fade-up" style="--d:620">
+        {positions} позиций в наличии · самовывоз за {client.hero.pickupMinutes} минут · оригинал
+        или возврат денег
+      </p>
+    </div>
+
+    <div class="hero__vis">
+      <!-- Секвенция банки: 36 кадров, <canvas>, индекс кадра привязан к прогрессу
+           скролла. Не WebGL — работает на бюджетном Android. -->
+      <div class="seq" data-seq>
+        <canvas
+          class="seq__canvas"
+          width="1000"
+          height="1000"
+          data-seq-canvas
+          role="img"
+          aria-label="Банка сывороточного протеина, вид с поворотом"></canvas>
+        <noscript>
+          <img
+            src={asset("/seq/jar-12.webp")}
+            width="1000"
+            height="1000"
+            alt="Банка сывороточного протеина"
+          />
+        </noscript>
+      </div>
+      <p class="t-micro seq__cap">
+        900 г · 30 порций · 24 г белка в порции
+      </p>
+    </div>
+  </div>
+
+  <div class="hero__scroll t-micro" aria-hidden="true">
+    <span>Крутите</span>
+    <span class="hero__scroll-rule"></span>
+  </div>
+</section>
+
+<!-- Этикетка «отклеивается» от банки и разворачивается вот в эту панель.
+     Товар → данные → доверие, один непрерывный жест. -->
+<section class="lpanel" data-unfold aria-label="Коротко о магазине">
+  <div class="wrap">
+    <div class="lpanel__box" data-unfold-box>
+      <div class="lpanel__head t-micro">
+        <span>Панель состава</span>
+        <span>{client.name} · {client.city}</span>
+      </div>
+      <dl class="lpanel__rows">
+        <div class="lpanel__row">
+          <dt class="t-data">Позиций в наличии</dt>
+          <dd class="num lpanel__v">{positions}</dd>
+        </div>
+        <div class="lpanel__row">
+          <dt class="t-data">Самовывоз</dt>
+          <dd class="num lpanel__v">
+            {client.hero.pickupMinutes}<span class="lpanel__u">мин</span>
+          </dd>
+        </div>
+        <div class="lpanel__row">
+          <dt class="t-data">Проверка кода</dt>
+          <dd class="num lpanel__v">100<span class="lpanel__u">%</span></dd>
+        </div>
+        <div class="lpanel__row">
+          <dt class="t-data">На рынке</dt>
+          <dd class="num lpanel__v">
+            {client.stats.years}<span class="lpanel__u">лет</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-top: calc(var(--header-h) + 40px);
+    padding-bottom: 40px;
+    overflow: clip;
+  }
+
+  /* Разлиновка этикетки: едва заметная сетка из хайрлайнов. */
+  .hero__rules {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--c-line) 0 1px,
+      transparent 1px 12.5%
+    );
+    opacity: 0.5;
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 70%, transparent);
+  }
+
+  .hero__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .hero__brow {
+    color: var(--c-steel);
+    margin-bottom: 20px;
+  }
+  /* Шкала H1 из ТЗ рассчитана на короткий заголовок в 3–4 слова.
+     Варианты 1 и 4 длинные, поэтому в герое держим потолок ниже —
+     иначе заголовок съедает весь первый экран и кнопки уходят за сгиб. */
+  .hero__h1 {
+    --h1-size: clamp(36px, 4.8vw, 70px);
+    margin-bottom: 24px;
+  }
+  .hero__sub {
+    color: color-mix(in srgb, var(--c-ink) 78%, transparent);
+    margin-bottom: 32px;
+  }
+  .hero__cta {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  @media (min-width: 560px) {
+    .hero__cta {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+  .hero__facts {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .hero__vis {
+    position: relative;
+    display: grid;
+    justify-items: center;
+  }
+  .seq {
+    position: relative;
+    width: min(100%, 520px);
+    aspect-ratio: 1;
+  }
+  .seq__canvas {
+    width: 100%;
+    height: 100%;
+    /* Мягкая контактная тень — единственная тень на странице. */
+    filter: drop-shadow(0 24px 32px rgba(20, 23, 26, 0.14));
+  }
+  .seq__cap {
+    margin-top: 8px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .hero__scroll {
+    display: none;
+    position: absolute;
+    left: var(--gutter);
+    bottom: 24px;
+    align-items: center;
+    gap: 12px;
+    text-transform: uppercase;
+  }
+  .hero__scroll-rule {
+    display: block;
+    width: 64px;
+    height: 1px;
+    background: var(--c-line-strong);
+    transform-origin: left;
+    animation: scrollrule 2.4s var(--ease) infinite;
+  }
+  @keyframes scrollrule {
+    0%,
+    100% {
+      transform: scaleX(0.3);
+      opacity: 0.4;
+    }
+    50% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .hero {
+      padding-top: calc(var(--header-h) + 64px);
+      padding-bottom: 72px;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+    }
+    .hero__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
+    .hero__text {
+      grid-column: 1 / span 7;
+    }
+    .hero__vis {
+      grid-column: 8 / span 5;
+    }
+    .hero__scroll {
+      display: flex;
+    }
+  }
+
+  /* ——— панель, в которую разворачивается этикетка ——— */
+  .lpanel {
+    padding-block: 8px 56px;
+  }
+  .lpanel__box {
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--radius-card);
+    background: var(--c-paper-2);
+    overflow: hidden;
+    transform-origin: center top;
+    will-change: transform, opacity;
+  }
+  .lpanel__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--c-line-strong);
+    text-transform: uppercase;
+    color: var(--c-steel);
+  }
+  .lpanel__rows {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lpanel__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    border-top: 1px solid var(--c-line);
+  }
+  .lpanel__row:nth-child(odd) {
+    border-right: 1px solid var(--c-line);
+  }
+  .lpanel__row:nth-child(-n + 2) {
+    border-top: 0;
+  }
+  .lpanel__row dt {
+    color: var(--c-steel);
+  }
+  .lpanel__v {
+    font-size: clamp(22px, 2.6vw, 34px);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .lpanel__u {
+    font-size: 0.42em;
+    letter-spacing: 0.04em;
+    color: var(--c-steel);
+    margin-left: 4px;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 760px) {
+    .lpanel__rows {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .lpanel__row {
+      border-top: 0;
+      border-right: 1px solid var(--c-line);
+    }
+    .lpanel__row:last-child {
+      border-right: 0;
+    }
+  }
+</style>
+
+<script>
+  import { initSequence } from '../scripts/sequence';
+  initSequence();
+</script>

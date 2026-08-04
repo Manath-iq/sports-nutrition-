@@ -1,0 +1,109 @@
+---
+import { link } from '../lib/paths';
+
+// Минимальный баннер без тёмных паттернов: «принять» и «только необходимые»
+// выглядят одинаково по весу, отказ не прячется и не требует лишних кликов.
+---
+
+<div class="cb" data-cookie hidden>
+  <div class="cb__in">
+    <p class="t-micro cb__text">
+      Сайт использует куки для статистики посещений. Карта и виджеты подключаются
+      только по вашему клику.
+      <a href={link("/privacy")} class="link-rule">Подробнее</a>
+    </p>
+    <div class="cb__actions">
+      <button type="button" class="btn btn-sm btn-outline" data-cookie-deny>
+        Только необходимые
+      </button>
+      <button type="button" class="btn btn-sm btn-signal" data-cookie-accept>Принять</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cb {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 70;
+    background: var(--c-paper);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--radius-card);
+    padding: 16px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+  .cb[data-show='true'] {
+    opacity: 1;
+    transform: none;
+  }
+  .cb__in {
+    display: grid;
+    gap: 14px;
+  }
+  .cb__text {
+    max-width: 80ch;
+  }
+  .cb__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cb__actions .btn {
+    flex: 1;
+  }
+
+  @media (min-width: 760px) {
+    .cb {
+      left: auto;
+      right: 24px;
+      bottom: 24px;
+      max-width: 520px;
+      padding: 20px;
+    }
+    .cb__actions .btn {
+      flex: none;
+    }
+  }
+</style>
+
+<script>
+  const KEY = 'cookie-choice';
+  const box = document.querySelector<HTMLElement>('[data-cookie]');
+
+  function close(choice: string) {
+    try {
+      localStorage.setItem(KEY, choice);
+    } catch {
+      /* приватный режим */
+    }
+    if (!box) return;
+    box.dataset.show = 'false';
+    setTimeout(() => (box.hidden = true), 240);
+  }
+
+  let saved: string | null = null;
+  try {
+    saved = localStorage.getItem(KEY);
+  } catch {
+    saved = 'skip';
+  }
+
+  if (box && !saved) {
+    // Показываем не сразу: баннер поверх первого экрана — это тот самый
+    // тёмный паттерн, которого просили избежать.
+    setTimeout(() => {
+      box.hidden = false;
+      requestAnimationFrame(() => (box.dataset.show = 'true'));
+    }, 1600);
+
+    box.querySelector('[data-cookie-accept]')?.addEventListener('click', () => close('all'));
+    box.querySelector('[data-cookie-deny]')?.addEventListener('click', () => close('necessary'));
+  }
+</script>

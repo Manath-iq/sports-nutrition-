@@ -1,0 +1,342 @@
+---
+import { client, telLink, waLink } from '../config/client.config';
+import { nav } from '../data/content';
+---
+
+<header class="hdr" data-header>
+  <div class="wrap hdr__in">
+    <a href="#top" class="logo">
+      <span class="logo__name">{client.name}</span>
+      <span class="logo__meta t-micro">СПОРТ<br />ПИТАНИЕ</span>
+    </a>
+
+    <nav class="hdr__nav" aria-label="Основная навигация">
+      {
+        nav.map((item) => (
+          <a href={item.href} class="hdr__link">
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="hdr__right">
+      <a href={telLink} class="hdr__phone t-data" data-goal="phone_click">
+        {client.contacts.phone}
+      </a>
+      <a href="#quiz" class="btn btn-sm btn-signal hdr__cta">Подобрать за 1 минуту</a>
+
+      <a
+        href={waLink('Здравствуйте! Вопрос по спортивному питанию.')}
+        class="hdr__wa"
+        aria-label="Написать в WhatsApp"
+        target="_blank"
+        rel="noopener"
+        data-goal="wa_click"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12.04 2a9.9 9.9 0 0 0-8.5 14.96L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.1 15.1l-.3-.18-3.1.9.83-3-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3.1 4.2c-.2 0-.5.07-.75.35-.26.28-.98.95-.98 2.3s1 2.67 1.14 2.85c.14.19 1.95 3.1 4.85 4.2 2.4.92 2.9.74 3.42.7.52-.05 1.68-.68 1.92-1.34.24-.66.24-1.22.17-1.34-.07-.12-.26-.19-.54-.33-.28-.14-1.68-.83-1.94-.92-.26-.1-.45-.14-.64.14-.19.28-.73.92-.9 1.1-.16.19-.33.21-.6.07-.28-.14-1.2-.44-2.28-1.4-.84-.75-1.4-1.67-1.57-1.95-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.5-.07-.13-.63-1.53-.87-2.1-.23-.55-.46-.47-.63-.48h-.54Z"
+          ></path>
+        </svg>
+      </a>
+
+      <button class="burger" data-burger aria-expanded="false" aria-controls="mobile-menu">
+        <span class="sr-only-x">Меню</span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mm" id="mobile-menu" data-menu hidden>
+  <div class="wrap mm__in">
+    <nav class="mm__nav" aria-label="Мобильная навигация">
+      {
+        nav.map((item, i) => (
+          <a href={item.href} class="mm__link" data-menu-link style={`--i:${i}`}>
+            <span class="mm__n t-micro">{String(i + 1).padStart(2, '0')}</span>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="mm__foot">
+      <div class="hairline"></div>
+      <p class="t-data mm__addr">{client.contacts.address}</p>
+      <p class="t-micro">{client.contacts.hours}</p>
+      <a href={telLink} class="mm__phone t-data">{client.contacts.phone}</a>
+      <a href="#quiz" class="btn btn-signal mm__cta" data-menu-link>Подобрать питание</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hdr {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    height: var(--header-h);
+    background: color-mix(in srgb, var(--c-paper) 72%, transparent);
+    backdrop-filter: blur(12px) saturate(1.4);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    border-bottom: 1px solid var(--c-line);
+    transform: translateY(0);
+    transition: transform 320ms var(--ease);
+  }
+  /* Прячется при скролле вниз, возвращается при скролле вверх. */
+  .hdr[data-hidden='true'] {
+    transform: translateY(-100%);
+  }
+
+  .hdr__in {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+  }
+  .logo__name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+  }
+  .logo__meta {
+    font-size: 8px;
+    line-height: 1.1;
+    letter-spacing: 0.08em;
+    padding-left: 8px;
+    border-left: 1px solid var(--c-line-strong);
+  }
+
+  .hdr__nav {
+    display: none;
+    gap: 26px;
+  }
+  .hdr__link {
+    font-size: 15px;
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    padding-block: 4px;
+  }
+  .hdr__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur) var(--ease);
+  }
+  .hdr__link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .hdr__right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .hdr__phone {
+    display: none;
+    color: inherit;
+    text-decoration: none;
+  }
+  .hdr__cta {
+    display: none;
+  }
+  .hdr__wa {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--c-line-strong);
+    color: inherit;
+    transition:
+      color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+  .hdr__wa:hover {
+    color: var(--c-signal);
+    border-color: var(--c-signal);
+  }
+
+  .burger {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-content: center;
+    gap: 6px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+  }
+  .burger span {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 240ms var(--ease);
+  }
+  .burger[aria-expanded='true'] span:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+  .burger[aria-expanded='true'] span:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+
+  /* ——— мобильное меню ——— */
+  .mm {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: var(--c-paper);
+    padding-top: var(--header-h);
+    display: flex;
+    opacity: 0;
+    transition: opacity 240ms var(--ease);
+  }
+  .mm[data-open='true'] {
+    opacity: 1;
+  }
+  .mm__in {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding-block: 24px 32px;
+  }
+  .mm__nav {
+    display: flex;
+    flex-direction: column;
+  }
+  .mm__link {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--c-line);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(28px, 8vw, 34px);
+    letter-spacing: -0.02em;
+    color: inherit;
+    text-decoration: none;
+  }
+  .mm__n {
+    font-size: 11px;
+  }
+  .mm__foot {
+    display: grid;
+    gap: 6px;
+    margin-top: 32px;
+  }
+  .mm__foot .hairline {
+    margin-bottom: 14px;
+  }
+  .mm__addr {
+    color: var(--c-ink);
+  }
+  .mm__phone {
+    color: var(--c-signal);
+    text-decoration: none;
+    margin-top: 6px;
+  }
+  .mm__cta {
+    margin-top: 14px;
+    width: 100%;
+  }
+
+  @media (min-width: 900px) {
+    .hdr__nav {
+      display: flex;
+    }
+    .hdr__phone,
+    .hdr__cta {
+      display: inline-flex;
+    }
+    .hdr__wa,
+    .burger {
+      display: none;
+    }
+    .mm {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+  // Шапка прячется вниз и возвращается вверх. Порог, чтобы не дёргалась.
+  let last = window.scrollY;
+  let ticking = false;
+
+  function onScroll() {
+    const y = window.scrollY;
+    if (!header) return;
+    if (Math.abs(y - last) > 6) {
+      const hidden = y > last && y > 200 && menu?.dataset.open !== 'true';
+      header.dataset.hidden = String(hidden);
+      last = y;
+    }
+    ticking = false;
+  }
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScroll);
+      }
+    },
+    { passive: true },
+  );
+
+  function setMenu(open: boolean) {
+    if (!burger || !menu) return;
+    burger.setAttribute('aria-expanded', String(open));
+    if (open) {
+      menu.hidden = false;
+      requestAnimationFrame(() => (menu.dataset.open = 'true'));
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      menu.dataset.open = 'false';
+      document.documentElement.style.overflow = '';
+      setTimeout(() => {
+        if (menu.dataset.open !== 'true') menu.hidden = true;
+      }, 240);
+    }
+  }
+
+  burger?.addEventListener('click', () =>
+    setMenu(burger.getAttribute('aria-expanded') !== 'true'),
+  );
+  menu?.querySelectorAll('[data-menu-link]').forEach((link) =>
+    link.addEventListener('click', () => setMenu(false)),
+  );
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && burger?.getAttribute('aria-expanded') === 'true') setMenu(false);
+  });
+</script>

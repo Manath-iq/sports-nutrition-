@@ -1,0 +1,88 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { client, telLink, waLink } from '../config/client.config';
+import { asset } from '../lib/paths';
+
+const c = client.consultant;
+const wa = waLink(`Здравствуйте, ${c.name}! Вопрос по подбору спортивного питания.`);
+---
+
+<section class="sec cons">
+  <div class="wrap">
+    <SectionHead n="12" title="Консультация" meta={`Ответ за ${c.replyMinutes}`} />
+
+    <div class="cons__grid">
+      <figure class="cons__ph" data-reveal="fade">
+        <img
+          src={asset(c.photo)}
+          alt={`${c.name}, ${c.role}`}
+          width="640"
+          height="800"
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
+
+      <div class="cons__text">
+        <h2 class="t-h2 cons__h" data-reveal="lines">Не уверены — просто спросите</h2>
+        <p class="t-body cons__p" data-reveal="fade">
+          {c.name}, {c.role}, {c.yearsGym} лет в зале и {c.yearsShop} лет за прилавком.
+          Ответит в WhatsApp за {c.replyMinutes} в рабочее время. Скажет и когда добавки
+          не нужны — это чаще, чем кажется.
+        </p>
+
+        <div class="cons__cta" data-reveal="fade">
+          <a href={wa} class="btn btn-signal" target="_blank" rel="noopener" data-goal="wa_click">
+            Написать в WhatsApp
+          </a>
+          <a href={telLink} class="btn btn-outline" data-goal="phone_click">Позвонить</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .cons__grid {
+    display: grid;
+    gap: 28px;
+    margin-top: 28px;
+    align-items: center;
+  }
+  .cons__ph {
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background: var(--c-paper-2);
+    max-width: 420px;
+  }
+  .cons__ph img {
+    width: 100%;
+    height: auto;
+  }
+  .cons__h {
+    --h2-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 20px;
+  }
+  .cons__p {
+    color: color-mix(in srgb, var(--c-ink) 80%, transparent);
+    margin-bottom: 28px;
+  }
+  .cons__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (min-width: 760px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .cons__grid {
+      grid-template-columns: 380px 1fr;
+      gap: 56px;
+    }
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { client } from '../config/client.config';
+import { deliveryRows } from '../data/content';
+---
+
+<section class="sec del" id="delivery">
+  <div class="wrap">
+    <SectionHead n="13" title="Доставка и оплата" meta={`Самовывоз за ${client.hero.pickupMinutes} минут`} />
+
+    <div class="del__grid">
+      <h2 class="t-h2 del__h" data-reveal="lines">Забрать сегодня или привезти завтра</h2>
+
+      <!-- Без иконок: только хайрлайны и моно-данные. -->
+      <dl class="del__rows" data-reveal-group>
+        {
+          deliveryRows.map((row) => (
+            <div class="del__row">
+              <dt class="t-data del__k">{row.label}</dt>
+              <dd class="del__v">
+                {row.value}
+                <span class="t-micro del__note">{row.note}</span>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <p class="t-micro del__legal">
+      Цены на сайте носят справочный характер{
+        !client.legal.isOffer && ' и не являются публичной офертой'
+      }. Актуальные наличие и стоимость подтверждаем при оформлении заявки.
+    </p>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .del__grid {
+    display: grid;
+    gap: 28px;
+    margin-top: 28px;
+  }
+  .del__rows {
+    border-top: 1px solid var(--c-line-strong);
+  }
+  .del__row {
+    display: grid;
+    gap: 4px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .del__k {
+    color: var(--c-steel);
+  }
+  .del__v {
+    font-size: clamp(16px, 1.7vw, 19px);
+    line-height: 1.35;
+  }
+  .del__note {
+    display: block;
+    margin-top: 4px;
+  }
+  .del__legal {
+    margin-top: 20px;
+    max-width: 70ch;
+  }
+
+  @media (min-width: 900px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .del__grid {
+      grid-template-columns: 1fr 1.2fr;
+      gap: 56px;
+      align-items: start;
+    }
+    .del__row {
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      align-items: baseline;
+    }
+  }
+</style>

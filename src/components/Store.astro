@@ -1,0 +1,196 @@
+---
+import SectionHead from './ui/SectionHead.astro';
+import { client, telLink } from '../config/client.config';
+import { asset } from '../lib/paths';
+
+const [lat, lon] = client.contacts.mapCoords;
+const routeUrl = `https://yandex.ru/maps/?rtext=~${lat},${lon}&rtt=auto`;
+const mapSrc = `https://yandex.ru/map-widget/v1/?ll=${lon}%2C${lat}&z=16&pt=${lon},${lat},pm2blm`;
+---
+
+<section class="sec store" id="store">
+  <div class="wrap">
+    <SectionHead n="10" title="Магазин вживую" meta={client.contacts.address} />
+
+    <div class="store__strip" data-reveal-group>
+      <figure class="store__ph store__ph--wide">
+        <img src={asset("/demo/store-1.webp")} alt="Витрина магазина снаружи" width="900" height="620" loading="lazy" decoding="async" />
+      </figure>
+      <figure class="store__ph">
+        <img src={asset("/demo/store-2.webp")} alt="Полки с товаром в торговом зале" width="600" height="620" loading="lazy" decoding="async" />
+      </figure>
+      <figure class="store__ph">
+        <img src={asset("/demo/store-3.webp")} alt="Пробники вкусов и шейкер на стойке" width="600" height="620" loading="lazy" decoding="async" />
+      </figure>
+    </div>
+
+    <div class="store__grid" id="contacts">
+      <div class="store__text">
+        <h2 class="t-h2 store__h" data-reveal="lines">Заходите — покажем и дадим попробовать вкус</h2>
+        <p class="t-body store__p" data-reveal="fade">
+          Пробники вкусов открыты, шейкер под рукой. Можно взять один сашет протеина
+          за {client.delivery.sachetPrice} ₽, попробовать дома и уже потом брать банку.
+        </p>
+
+        <dl class="store__facts">
+          <div class="store__fact">
+            <dt class="t-data">Адрес</dt>
+            <dd>
+              {client.contacts.address}
+              <span class="t-micro store__note">{client.contacts.addressNote}</span>
+            </dd>
+          </div>
+          <div class="store__fact">
+            <dt class="t-data">Режим работы</dt>
+            <dd>{client.contacts.hours}</dd>
+          </div>
+          <div class="store__fact">
+            <dt class="t-data">Телефон</dt>
+            <dd><a href={telLink} class="link-rule" data-goal="phone_click">{client.contacts.phone}</a></dd>
+          </div>
+        </dl>
+
+        <a href={routeUrl} class="btn btn-signal store__cta" target="_blank" rel="noopener">
+          Построить маршрут
+        </a>
+      </div>
+
+      <!-- Карта грузится по клику: iframe весит больше всей страницы
+           и тянет за собой куки стороннего сервиса. -->
+      <div class="store__map" data-map data-src={mapSrc}>
+        <button type="button" class="store__mapbtn" data-map-load>
+          <span class="t-data">Показать карту</span>
+          <span class="t-micro">Загрузит виджет Яндекс.Карт и его куки</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sec {
+    padding-block: 56px;
+  }
+  .store__strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-block: 28px 40px;
+  }
+  .store__ph {
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background: var(--c-paper-2);
+  }
+  .store__ph--wide {
+    grid-column: span 2;
+  }
+  .store__ph img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .store__grid {
+    display: grid;
+    gap: 32px;
+  }
+  .store__h {
+    --h2-size: clamp(30px, 3.2vw, 44px);
+    margin-bottom: 20px;
+  }
+  .store__p {
+    color: var(--c-steel);
+    margin-bottom: 28px;
+  }
+  .store__facts {
+    border-top: 1px solid var(--c-line);
+    margin-bottom: 28px;
+  }
+  .store__fact {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .store__fact dt {
+    color: var(--c-steel);
+  }
+  .store__fact dd {
+    font-size: 17px;
+  }
+  .store__note {
+    display: block;
+  }
+
+  .store__map {
+    position: relative;
+    min-height: 320px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background: var(--c-paper-2);
+    border: 1px solid var(--c-line);
+  }
+  .store__map iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    position: absolute;
+    inset: 0;
+  }
+  .store__mapbtn {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 6px;
+    text-align: center;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+    padding: 24px;
+  }
+  .store__mapbtn:hover .t-data {
+    color: var(--c-signal);
+  }
+
+  @media (min-width: 900px) {
+    .sec {
+      padding-block: 80px;
+    }
+    .store__strip {
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+    .store__ph--wide {
+      grid-column: span 1;
+    }
+    .store__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: start;
+    }
+    .store__fact {
+      grid-template-columns: 200px 1fr;
+      gap: 24px;
+      align-items: baseline;
+    }
+    .store__map {
+      min-height: 460px;
+    }
+  }
+</style>
+
+<script>
+  // Карта — единственный сторонний ресурс на странице, и он по клику.
+  const box = document.querySelector<HTMLElement>('[data-map]');
+  box?.querySelector('[data-map-load]')?.addEventListener('click', () => {
+    const frame = document.createElement('iframe');
+    frame.src = box.dataset.src!;
+    frame.loading = 'lazy';
+    frame.title = 'Карта: как нас найти';
+    frame.setAttribute('allowfullscreen', '');
+    box.replaceChildren(frame);
+  });
+</script>

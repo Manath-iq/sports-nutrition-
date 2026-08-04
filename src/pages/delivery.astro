@@ -1,0 +1,162 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import PageHead from '../components/PageHead.astro';
+import Footer from '../components/Footer.astro';
+import { client, waLink } from '../config/client.config';
+import { deliveryRows } from '../data/content';
+import { link } from '../lib/paths';
+
+const title = `Доставка и оплата — ${client.name}`;
+const description = `Условия доставки и оплаты ${client.cityIn}: самовывоз за ${client.hero.pickupMinutes} минут, доставка по городу день в день, отправка по России.`;
+---
+
+<Base title={title} description={description} bare>
+  <Header />
+  <main id="main">
+    <PageHead
+      brow="Информация"
+      title="Доставка и оплата"
+      note={`Актуально для ${client.cityGen} и отправок по России`}
+    />
+
+    <div class="wrap doc">
+      <dl class="rows">
+        {
+          deliveryRows.map((row) => (
+            <div class="row">
+              <dt class="t-data row__k">{row.label}</dt>
+              <dd class="row__v">
+                {row.value}
+                <span class="t-micro row__note">{row.note}</span>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <section class="block">
+        <h2 class="t-h3 block__h">Как проходит заказ</h2>
+        <ol class="steps">
+          <li><span class="t-data steps__n">01</span> Оставляете заявку на сайте или пишете в WhatsApp.</li>
+          <li><span class="t-data steps__n">02</span> Проверяем наличие и подтверждаем итоговую сумму — до оплаты.</li>
+          <li><span class="t-data steps__n">03</span> Собираем заказ и сообщаем, когда можно забрать или когда привезём.</li>
+          <li><span class="t-data steps__n">04</span> Оплата при получении: наличными, картой или переводом по СБП.</li>
+        </ol>
+      </section>
+
+      <section class="block" id="returns">
+        <h2 class="t-h3 block__h">Возврат и обмен</h2>
+        <p class="block__p">
+          Товар надлежащего качества из категории «продукты питания и БАД» обмену и возврату
+          не подлежит, если упаковка вскрыта, — это требование к пищевой продукции, а не
+          наше правило.
+        </p>
+        <p class="block__p">
+          Если упаковка не вскрыта и товарный вид сохранён, вернём или обменяем в течение
+          14 дней. Если товар оказался с браком, истёкшим сроком годности или не прошёл
+          проверку по коду производителя — возвращаем деньги в тот же день, без условий.
+        </p>
+        <p class="block__p">
+          Проверить код можно прямо у кассы при покупке: мы для этого и предлагаем это
+          сделать при вас.
+        </p>
+      </section>
+
+      <section class="block">
+        <h2 class="t-h3 block__h">Скидки</h2>
+        <p class="block__p">
+          От {client.delivery.bulkFrom.toLocaleString('ru-RU')} ₽ в заказе действует скидка
+          {client.delivery.bulkPercent}%. Постоянным покупателям — накопительная,
+          считаем на месте, отдельную карту заводить не нужно.
+        </p>
+      </section>
+
+      <div class="cta">
+        <a href={waLink('Здравствуйте! Вопрос по доставке.')} class="btn btn-signal" target="_blank" rel="noopener">
+          Спросить про доставку
+        </a>
+        <a href={link("/#quiz")} class="btn btn-outline">Подобрать питание</a>
+      </div>
+
+      <p class="t-micro legal">
+        Информация на странице носит справочный характер{
+          !client.legal.isOffer && ' и не является публичной офертой'
+        }. Итоговые условия подтверждаем при оформлении заявки.
+      </p>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .doc {
+    padding-block: 48px 72px;
+    max-width: 900px;
+  }
+  .rows {
+    border-top: 1px solid var(--c-line-strong);
+    margin-bottom: 48px;
+  }
+  .row {
+    display: grid;
+    gap: 4px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .row__k {
+    color: var(--c-steel);
+  }
+  .row__v {
+    font-size: 18px;
+  }
+  .row__note {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .block {
+    padding-block: 28px;
+    border-top: 1px solid var(--c-line);
+  }
+  .block__h {
+    margin-bottom: 16px;
+  }
+  .block__p {
+    color: var(--c-steel);
+    margin-bottom: 12px;
+    max-width: 68ch;
+  }
+  .steps {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .steps__n {
+    color: var(--c-steel);
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .legal {
+    margin-top: 28px;
+  }
+
+  @media (min-width: 760px) {
+    .row {
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      align-items: baseline;
+    }
+  }
+</style>

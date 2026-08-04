@@ -1,0 +1,35 @@
+---
+interface Props {
+  brow: string;
+  title: string;
+  note?: string;
+}
+const { brow, title, note } = Astro.props;
+---
+
+<header class="phead">
+  <div class="wrap">
+    <p class="t-data phead__brow">{brow}</p>
+    <h1 class="t-h1 phead__h">{title}</h1>
+    {note && <p class="t-micro phead__note">{note}</p>}
+  </div>
+</header>
+
+<style>
+  .phead {
+    padding-top: calc(var(--header-h) + 56px);
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .phead__brow {
+    color: var(--c-steel);
+    margin-bottom: 20px;
+  }
+  .phead__h {
+    --h1-size: clamp(34px, 4.4vw, 64px);
+    max-width: 20ch;
+  }
+  .phead__note {
+    margin-top: 20px;
+  }
+</style>

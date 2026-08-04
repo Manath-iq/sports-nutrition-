@@ -1,0 +1,77 @@
+---
+import { client, waLink } from '../config/client.config';
+
+const href = waLink(
+  `Здравствуйте! Пишу с сайта ${client.name}. Подскажите, что подойдёт под мою цель?`,
+);
+---
+
+<a
+  class="fab"
+  data-fab
+  href={href}
+  target="_blank"
+  rel="noopener"
+  aria-label="Написать в WhatsApp"
+  data-goal="wa_click"
+>
+  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M12.04 2a9.9 9.9 0 0 0-8.5 14.96L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.1 15.1l-.3-.18-3.1.9.83-3-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3.1 4.2c-.2 0-.5.07-.75.35-.26.28-.98.95-.98 2.3s1 2.67 1.14 2.85c.14.19 1.95 3.1 4.85 4.2 2.4.92 2.9.74 3.42.7.52-.05 1.68-.68 1.92-1.34.24-.66.24-1.22.17-1.34-.07-.12-.26-.19-.54-.33-.28-.14-1.68-.83-1.94-.92-.26-.1-.45-.14-.64.14-.19.28-.73.92-.9 1.1-.16.19-.33.21-.6.07-.28-.14-1.2-.44-2.28-1.4-.84-.75-1.4-1.67-1.57-1.95-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.5.14-.16.19-.28.28-.47.1-.19.05-.35-.02-.5-.07-.13-.63-1.53-.87-2.1-.23-.55-.46-.47-.63-.48h-.54Z"
+    ></path>
+  </svg>
+</a>
+
+<style>
+  /* Появляется после 40% скролла и уступает место корзине-заявке. */
+  .fab {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 45;
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--c-ink);
+    color: var(--c-paper);
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+    pointer-events: none;
+    transition:
+      opacity var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+  .fab[data-show='true'] {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .fab[data-lift='true'] {
+    transform: translateY(-72px);
+  }
+  .fab:hover {
+    background: var(--c-signal);
+    color: var(--c-on-signal);
+  }
+</style>
+
+<script>
+  const fab = document.querySelector<HTMLElement>('[data-fab]');
+  const bar = document.querySelector<HTMLElement>('[data-order-bar]');
+  if (fab) {
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? window.scrollY / max : 0;
+      fab.dataset.show = String(p > 0.4);
+      fab.dataset.lift = String(bar?.dataset.open === 'true');
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    // Корзина появляется независимо от скролла — следим и за ней.
+    if (bar) new MutationObserver(update).observe(bar, { attributes: true });
+    update();
+  }
+</script>
