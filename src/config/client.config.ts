@@ -7,6 +7,14 @@
 export type Theme = 'light' | 'dark';
 
 export interface ClientConfig {
+  /**
+   * Демо-сборка для портфолио, а не сайт работающего магазина.
+   * true закрывает страницу от индексации, убирает микроразметку Store
+   * и FAQPage (заявка на существующий магазин с адресом и телефоном,
+   * которых нет) и включает оговорку в подвале.
+   * Под живого клиента — false, и всё это возвращается само.
+   */
+  demo: boolean;
   name: string;
   legalName: string;
   city: string;
@@ -89,6 +97,7 @@ export interface ClientConfig {
 }
 
 export const client: ClientConfig = {
+  demo: true,
   name: 'СОСТАВ',
   legalName: 'магазин спортивного питания «СОСТАВ»',
   city: 'Нижнекамск',

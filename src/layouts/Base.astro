@@ -76,6 +76,12 @@ const faqSchema = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {
+      /* Демо не должно занимать выдачу по «спортпит Нижнекамск» вместо
+         работающих магазинов. follow, а не nofollow: ссылка на автора
+         в подвале должна работать. */
+      client.demo && <meta name="robots" content="noindex, follow" />
+    }
     <meta name="theme-color" content={client.theme === 'dark' ? '#0E1013' : '#EFEEE9'} />
 
     <!-- Кириллица грузится первой: на ней набрана вся страница.
@@ -104,13 +110,19 @@ const faqSchema = {
       })();
     </script>
 
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify(localBusiness)}
-      is:inline
-    />
     {
-      !bare && (
+      /* Микроразметка настоящего магазина — только когда магазин настоящий:
+         Store уходит в локальную выдачу с адресом и часами работы. */
+      !client.demo && (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(localBusiness)}
+          is:inline
+        />
+      )
+    }
+    {
+      !bare && !client.demo && (
         <script
           type="application/ld+json"
           set:html={JSON.stringify(faqSchema)}

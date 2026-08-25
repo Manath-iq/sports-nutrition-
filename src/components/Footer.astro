@@ -66,6 +66,20 @@ import { link } from '../lib/paths';
       консультация специалиста.{!client.legal.isOffer && ' Не является публичной офертой.'}
     </p>
 
+    {
+      /* Оговорка нужна ровно потому, что реквизиты и адрес выше — заглушки.
+         Без неё страница выглядит сайтом работающего магазина. */
+      client.demo && (
+        <p class="ftr__disclaimer t-micro">
+          Демонстрационный макет из портфолио — не действующий магазин. Название,
+          реквизиты, адрес, цены и отзывы вымышлены. Собрал{' '}
+          <a href="https://manath.site/" rel="noopener" class="link-rule">
+            Максим, manath.site
+          </a>
+        </p>
+      )
+    }
+
     <div class="ftr__bottom t-micro">
       <span>{client.legal.entity}, ИНН {client.legal.inn}</span>
       <span>© {currentYear} {client.name}</span>
